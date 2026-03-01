@@ -2,8 +2,9 @@
 
 import { useState } from "react"
 import Link from "next/link"
-import { Search, ShoppingBag, Menu } from "lucide-react"
+import { Search, ShoppingBag, Menu, User } from "lucide-react"
 import { useCart } from "@/context/CartContext"
+import { useAuth } from "@/context/AuthContext"
 import { Button } from "@/components/ui/button"
 import { Badge } from "@/components/ui/badge"
 import {
@@ -22,6 +23,7 @@ const navLinks = [
 
 export function Header() {
   const { toggleCart, cartCount } = useCart()
+  const { isAuthenticated } = useAuth()
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
@@ -67,6 +69,15 @@ export function Header() {
             <Button variant="ghost" size="icon" asChild>
               <Link href="/busca" aria-label="Search">
                 <Search className="size-5 text-[#1a1a1a]" />
+              </Link>
+            </Button>
+
+            <Button variant="ghost" size="icon" asChild>
+              <Link
+                href={isAuthenticated ? "/conta" : "/login"}
+                aria-label="Account"
+              >
+                <User className="size-5 text-[#1a1a1a]" />
               </Link>
             </Button>
 

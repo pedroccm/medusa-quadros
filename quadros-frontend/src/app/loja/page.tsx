@@ -25,9 +25,11 @@ function getLowestPrice(product: MedusaProduct): number | null {
       continue
     }
 
-    for (const price of variant.prices) {
-      if (lowest === null || price.amount < lowest) {
-        lowest = price.amount
+    if (variant.prices) {
+      for (const price of variant.prices) {
+        if (lowest === null || price.amount < lowest) {
+          lowest = price.amount
+        }
       }
     }
   }

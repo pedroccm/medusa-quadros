@@ -147,9 +147,14 @@ export async function getRegions(): Promise<{ regions: MedusaRegion[] }> {
   return medusaFetch("/store/regions")
 }
 
+let cachedRegionId: string | null = null
+
 async function getDefaultRegionId(): Promise<string> {
+  if (cachedRegionId) return cachedRegionId
   const { regions } = await getRegions()
-  return regions?.[0]?.id || ""
+  const brRegion = regions?.find((r) => r.currency_code === "brl")
+  cachedRegionId = brRegion?.id || regions?.[0]?.id || ""
+  return cachedRegionId
 }
 
 // --- Cart ---
@@ -237,4 +242,124 @@ export function formatPrice(
     style: "currency",
     currency: currencyCode,
   }).format(amount)
+}
+
+// --- Customer Types ---
+
+export interface MedusaCustomer {
+  id: string
+  email: string
+  first_name: string | null
+  last_name: string | null
+  phone: string | null
+  has_account: boolean
+  addresses: MedusaAddress[]
+  created_at: string
+}
+
+export interface MedusaAddress {
+  id: string
+  first_name: string | null
+  last_name: string | null
+  address_1: string | null
+  address_2: string | null
+  city: string | null
+  province: string | null
+  postal_code: string | null
+  country_code: string | null
+  phone: string | null
+}
+
+export interface MedusaOrder {
+  id: string
+  display_id: number
+  status: string
+  email: string
+  total: number
+  subtotal: number
+  shipping_total: number
+  tax_total: number
+  items: MedusaLineItem[]
+  created_at: string
+  currency_code: string
+  fulfillment_status: string
+  payment_status: string
+  shipping_address: MedusaAddress | null
+}
+
+// --- Auth Helpers ---
+
+async function medusaAuthFetch<T = Record<string, unknown>>(
+  endpoint: string,
+  token: string,
+  options: RequestInit = {}
+): Promise<T> {
+  return medusaFetch<T>(endpoint, {
+    ...options,
+    headers: {
+      ...options.headers,
+      Authorization: `Bearer ${token}`,
+    },
+  })
+}
+
+// --- Customer Auth ---
+
+export async function registerCustomer(
+  email: string,
+  password: string
+): Promise<{ token: string }> {
+  return medusaFetch("/auth/customer/emailpass/register", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  })
+}
+
+export async function loginCustomer(
+  email: string,
+  password: string
+): Promise<{ token: string }> {
+  return medusaFetch("/auth/customer/emailpass", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  })
+}
+
+export async function createCustomerProfile(
+  token: string,
+  data: { email: string; first_name: string; last_name: string }
+): Promise<{ customer: MedusaCustomer }> {
+  return medusaAuthFetch("/store/customers", token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function getCustomerMe(
+  token: string
+): Promise<{ customer: MedusaCustomer }> {
+  return medusaAuthFetch("/store/customers/me", token)
+}
+
+export async function updateCustomerMe(
+  token: string,
+  data: Partial<{ first_name: string; last_name: string; phone: string }>
+): Promise<{ customer: MedusaCustomer }> {
+  return medusaAuthFetch("/store/customers/me", token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function getCustomerOrders(
+  token: string
+): Promise<{ orders: MedusaOrder[]; count: number }> {
+  return medusaAuthFetch("/store/orders", token)
+}
+
+export async function getCustomerOrder(
+  token: string,
+  orderId: string
+): Promise<{ order: MedusaOrder }> {
+  return medusaAuthFetch(`/store/orders/${orderId}`, token)
 }

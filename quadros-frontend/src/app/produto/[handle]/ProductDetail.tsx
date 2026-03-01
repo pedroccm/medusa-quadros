@@ -26,7 +26,7 @@ function getVariantPrice(variant: MedusaVariant): number | null {
   if (variant.calculated_price) {
     return variant.calculated_price.calculated_amount
   }
-  if (variant.prices.length > 0) {
+  if (variant.prices?.length > 0) {
     return variant.prices[0].amount
   }
   return null
