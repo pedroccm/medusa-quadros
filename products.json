@@ -1,0 +1,722 @@
+[
+  {
+    "name": "Harry Potter plataforma 9 3/4 Hogwarts »",
+    "slug": "harry-potter-plataforma-9-34-hogwarts",
+    "description": "Quadro decorativo Harry Potter plataforma 9 3/4 Hogwarts ». Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Filmes",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/harry-potter-plataforma-9-34-hogwarts.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/07/44-2.png",
+    "id": 1
+  },
+  {
+    "name": "Star Wars – Darth Vader",
+    "slug": "star-wars-darth-vader",
+    "description": "Quadro decorativo Star Wars – Darth Vader. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Filmes",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/star-wars-darth-vader.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/07/43-2.png",
+    "id": 2
+  },
+  {
+    "name": "Audrey Hepburn mascando chiclete",
+    "slug": "audrey-hepburn-mascando-chiclete",
+    "description": "Quadro decorativo Audrey Hepburn mascando chiclete. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Filmes",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/audrey-hepburn-mascando-chiclete.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/07/6-1.png",
+    "id": 3
+  },
+  {
+    "name": "Marilyn Monroe mascando chiclete",
+    "slug": "marilyn-monroe-mascando-chiclete",
+    "description": "Quadro decorativo Marilyn Monroe mascando chiclete. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Filmes",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/marilyn-monroe-mascando-chiclete.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2018/02/quadro-poster-marilyn-monroe-chiclete.png",
+    "id": 4
+  },
+  {
+    "name": "O poderoso chefão",
+    "slug": "o-poderoso-chefao",
+    "description": "Quadro decorativo O poderoso chefão. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Filmes",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/o-poderoso-chefao.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/07/36-3.png",
+    "id": 5
+  },
+  {
+    "name": "Preguiça é o ato de descansar Antes de estar cansado – Homer Simpson",
+    "slug": "preguica-e-o-ato-de-descansar-antes-de-estar-cansado-homer-simpson",
+    "description": "Quadro decorativo Preguiça é o ato de descansar Antes de estar cansado – Homer Simpson. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Filmes",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/preguica-e-o-ato-de-descansar-antes-de-estar-cansado-homer-simpson.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/07/mini_homer_preguica.png",
+    "id": 6
+  },
+  {
+    "name": "I’ll be there for you »",
+    "slug": "ill-be-there-for-you",
+    "description": "Quadro decorativo I’ll be there for you ». Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Series",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/ill-be-there-for-you.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/07/37-3.png",
+    "id": 7
+  },
+  {
+    "name": "Breaking Bad – Let’s Cook",
+    "slug": "breaking-bad-lets-cook",
+    "description": "Quadro decorativo Breaking Bad – Let’s Cook. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Series",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/breaking-bad-lets-cook.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2018/02/breaking-bad-lets-cook.png",
+    "id": 8
+  },
+  {
+    "name": "Supernatural – Carry n my wayward son »",
+    "slug": "supernatural-carry-n-my-wayward-son",
+    "description": "Quadro decorativo Supernatural – Carry n my wayward son ». Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Series",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/supernatural-carry-n-my-wayward-son.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2018/02/quadro-decorativo-poster-Supernatural-Carry-on-my-wayward-son-01.png",
+    "id": 9
+  },
+  {
+    "name": "Grey’s Anatomy – Meredith Grey e Cristina Yang",
+    "slug": "greys-anatomy-meredith-grey-e-cristina-yang",
+    "description": "Quadro decorativo Grey’s Anatomy – Meredith Grey e Cristina Yang. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Series",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/greys-anatomy-meredith-grey-e-cristina-yang.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2018/01/Greys-Anatomy-You-are-my-person-Meredith-Cristina-01.png",
+    "id": 10
+  },
+  {
+    "name": "Ra-tim-bum",
+    "slug": "ra-tim-bum",
+    "description": "Quadro decorativo Ra-tim-bum. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Series",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/ra-tim-bum.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/07/53.png",
+    "id": 11
+  },
+  {
+    "name": "Player Musical Spotify",
+    "slug": "player-musical-spotify",
+    "description": "Quadro decorativo Player Musical Spotify. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Musica",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/player-musical-spotify.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2020/10/player-personalizado-spotify-1.png",
+    "id": 12
+  },
+  {
+    "name": "Player Musical Spotify Interativo Preto",
+    "slug": "player-musical-spotify-interativo-preto",
+    "description": "Quadro decorativo Player Musical Spotify Interativo Preto. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Musica",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/player-musical-spotify-interativo-preto.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2021/05/player_preto.png",
+    "id": 13
+  },
+  {
+    "name": "The Beatles",
+    "slug": "the-beatles",
+    "description": "Quadro decorativo The Beatles. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Musica",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/the-beatles.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/07/30.png",
+    "id": 14
+  },
+  {
+    "name": "You Rock – Horizontal",
+    "slug": "you-rock-horizontal",
+    "description": "Quadro decorativo You Rock – Horizontal. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Musica",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/you-rock-horizontal.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/08/vertical-1.png",
+    "id": 15
+  },
+  {
+    "name": "Pra quem tem pensamento forte, o impossível é só questão de opinião",
+    "slug": "pra-quem-tem-pensamento-forte-o-impossivel-e-so-questao-de-opiniao",
+    "description": "Quadro decorativo Pra quem tem pensamento forte, o impossível é só questão de opinião. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Musica",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/pra-quem-tem-pensamento-forte-o-impossivel-e-so-questao-de-opiniao.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/10/quadro-poster-pra-quem-tem-pensamento-forte-01.png",
+    "id": 16
+  },
+  {
+    "name": "Por onde for… Beth Carvalho",
+    "slug": "por-onde-for-beth-carvalho",
+    "description": "Quadro decorativo Por onde for… Beth Carvalho. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Musica",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/por-onde-for-beth-carvalho.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2018/08/por_onde_for_tb.png",
+    "id": 17
+  },
+  {
+    "name": "Frase personalizada – A tela em branco",
+    "slug": "frase-personalizada-a-tela-em-branco",
+    "description": "Quadro decorativo Frase personalizada – A tela em branco. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Frases",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/frase-personalizada-a-tela-em-branco.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/08/01.png",
+    "id": 18
+  },
+  {
+    "name": "Frase personalizada – Lousa",
+    "slug": "frase-personalizada-lousa",
+    "description": "Quadro decorativo Frase personalizada – Lousa. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Frases",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/frase-personalizada-lousa.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/10/quadro-poster-personalizado-lousa.png",
+    "id": 19
+  },
+  {
+    "name": "Frase personalizada – A tela em branco – Horizontal",
+    "slug": "frase-personalizada-a-tela-em-branco-horizontal",
+    "description": "Quadro decorativo Frase personalizada – A tela em branco – Horizontal. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Frases",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/frase-personalizada-a-tela-em-branco-horizontal.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2018/07/vertical-quadro-decorativo-frase-personalizada.png",
+    "id": 20
+  },
+  {
+    "name": "Pense positivo, seja otimista",
+    "slug": "pense-positivo-seja-otimista",
+    "description": "Quadro decorativo Pense positivo, seja otimista. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Frases",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/pense-positivo-seja-otimista.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2018/05/quadro-poster-Pense-positivo-seja-otimista-01.png",
+    "id": 21
+  },
+  {
+    "name": "O essencial é invisível aos olhos",
+    "slug": "o-essencial-e-invisivel-aos-olhos",
+    "description": "Quadro decorativo O essencial é invisível aos olhos. Arte em alta qualidade impressa em papel especial com moldura.",
+    "category": "Frases",
+    "price": 29.9,
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/o-essencial-e-invisivel-aos-olhos.jpg",
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2017/10/04.png",
+    "id": 22
+  },
+  {
+    "name": "Folhas de bananeira",
+    "slug": "folhas-de-bananeira",
+    "category": "Natureza",
+    "price": 29.9,
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2018/02/quadro-decorativo-poster-Bananeira-01.png",
+    "description": "Quadro decorativo Folhas de bananeira. Arte em alta qualidade impressa em papel especial com moldura.",
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/folhas-de-bananeira.jpg",
+    "id": 23
+  },
+  {
+    "name": "Folhagem Verde Costela de Adão Tropical",
+    "slug": "folhagem-verde-costela-de-adao-tropical",
+    "category": "Natureza",
+    "price": 29.9,
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2019/03/folhagem_verde_costela_de_adao_tropicalPrancheta-1.png",
+    "description": "Quadro decorativo Folhagem Verde Costela de Adão Tropical. Arte em alta qualidade impressa em papel especial com moldura.",
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/folhagem-verde-costela-de-adao-tropical.jpg",
+    "id": 24
+  },
+  {
+    "name": "Borboleta Vintage",
+    "slug": "borboleta-vintage",
+    "category": "Natureza",
+    "price": 29.9,
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2021/09/thumbnail-vertical-3-30b95d6a.png",
+    "description": "Quadro decorativo Borboleta Vintage. Arte em alta qualidade impressa em papel especial com moldura.",
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/borboleta-vintage.jpg",
+    "id": 25
+  },
+  {
+    "name": "Lavanda",
+    "slug": "lavanda",
+    "category": "Natureza",
+    "price": 29.9,
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2019/04/Lavanda-natureza.png",
+    "description": "Quadro decorativo Lavanda. Arte em alta qualidade impressa em papel especial com moldura.",
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/lavanda.jpg",
+    "id": 26
+  },
+  {
+    "name": "Folhagem Figueira lira",
+    "slug": "folhagem-figueira-lira",
+    "category": "Natureza",
+    "price": 29.9,
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2019/03/Figueira-lira-Natureza.png",
+    "description": "Quadro decorativo Folhagem Figueira lira. Arte em alta qualidade impressa em papel especial com moldura.",
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/folhagem-figueira-lira.jpg",
+    "id": 27
+  },
+  {
+    "name": "Evangelion Mecha",
+    "slug": "evangelion-mecha",
+    "category": "Animes",
+    "price": 29.9,
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2022/11/download-6c678307.png",
+    "description": "Quadro decorativo Evangelion Mecha. Arte em alta qualidade impressa em papel especial com moldura.",
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/evangelion-mecha.jpg",
+    "id": 28
+  },
+  {
+    "name": "Kaonashi – A Viagem de Chihiro",
+    "slug": "kaonashi-a-viagem-de-chihiro",
+    "category": "Animes",
+    "price": 29.9,
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2022/12/kaonashi-076d1534.png",
+    "description": "Quadro decorativo Kaonashi – A Viagem de Chihiro. Arte em alta qualidade impressa em papel especial com moldura.",
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/kaonashi-a-viagem-de-chihiro.jpg",
+    "id": 29
+  },
+  {
+    "name": "Totoro na frente da lua – Meu Amigo Totoro",
+    "slug": "totoro-na-frente-da-lua-meu-amigo-totoro",
+    "category": "Animes",
+    "price": 29.9,
+    "image_url_original": "https://www.quadrorama.com.br/imagens/miniatura/listagem/?quadro=2022/12/dwqdwq-f3d0651e.png",
+    "description": "Quadro decorativo Totoro na frente da lua – Meu Amigo Totoro. Arte em alta qualidade impressa em papel especial com moldura.",
+    "variants": [
+      {
+        "size": "20x30cm",
+        "price": 29.9
+      },
+      {
+        "size": "30x40cm",
+        "price": 39.77
+      },
+      {
+        "size": "40x60cm",
+        "price": 53.22
+      }
+    ],
+    "image": "./product-images/totoro-na-frente-da-lua-meu-amigo-totoro.jpg",
+    "id": 30
+  }
+]
