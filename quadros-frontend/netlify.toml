@@ -1,0 +1,11 @@
+[build]
+  command = "npm run build"
+  publish = ".next"
+
+[build.environment]
+  NODE_VERSION = "20"
+  NEXT_PUBLIC_MEDUSA_BACKEND_URL = "http://localhost:9000"
+  NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY = "pk_f69ae9716e3053c6d517eb6245a23ad35c0b0c6970f5d358cf6286428e62a7ac"
+
+[[plugins]]
+  package = "@netlify/plugin-nextjs"
