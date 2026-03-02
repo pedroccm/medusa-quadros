@@ -30,27 +30,50 @@ export function CreditCardForm({
   const formRef = useRef<HTMLFormElement>(null)
   const cardFormRef = useRef<any>(null)
   const [loading, setLoading] = useState(true)
+  const [initError, setInitError] = useState(false)
   const [installmentOptions, setInstallmentOptions] = useState<
     { label: string; value: number }[]
   >([])
   const [selectedInstallments, setSelectedInstallments] = useState(1)
   const initialized = useRef(false)
+  const onTokenRef = useRef(onTokenGenerated)
+  const onErrorRef = useRef(onError)
+
+  // Keep refs in sync without triggering re-init
+  useEffect(() => {
+    onTokenRef.current = onTokenGenerated
+    onErrorRef.current = onError
+  }, [onTokenGenerated, onError])
 
   useEffect(() => {
     if (initialized.current) return
     initialized.current = true
 
+    let retries = 0
+    const maxRetries = 10
+
     const initCardForm = () => {
       if (!window.MercadoPago) {
-        setTimeout(initCardForm, 500)
+        retries++
+        if (retries < maxRetries) {
+          setTimeout(initCardForm, 500)
+        } else {
+          setInitError(true)
+          setLoading(false)
+        }
+        return
+      }
+
+      const publicKey = process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY
+      if (!publicKey) {
+        console.error("NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY is not set")
+        setInitError(true)
+        setLoading(false)
         return
       }
 
       try {
-        const mp = new window.MercadoPago(
-          process.env.NEXT_PUBLIC_MERCADOPAGO_PUBLIC_KEY,
-          { locale: "pt-BR" }
-        )
+        const mp = new window.MercadoPago(publicKey, { locale: "pt-BR" })
 
         const fieldStyle = {
           fontSize: "14px",
@@ -93,7 +116,7 @@ export function CreditCardForm({
             onFormMounted: (error: any) => {
               if (error) {
                 console.error("CardForm mount error:", error)
-                onError("Erro ao carregar formulario de cartao")
+                setInitError(true)
               }
               setLoading(false)
             },
@@ -111,10 +134,10 @@ export function CreditCardForm({
               event.preventDefault()
               const cardFormData = cardFormRef.current?.getCardFormData()
               if (!cardFormData?.token) {
-                onError("Erro ao processar cartao. Verifique os dados.")
+                onErrorRef.current("Erro ao processar cartao. Verifique os dados.")
                 return
               }
-              onTokenGenerated({
+              onTokenRef.current({
                 token: cardFormData.token,
                 installments: selectedInstallments,
                 payment_method_id: cardFormData.paymentMethodId,
@@ -128,7 +151,7 @@ export function CreditCardForm({
         })
       } catch (err: any) {
         console.error("MP init error:", err)
-        onError("Erro ao inicializar pagamento")
+        setInitError(true)
         setLoading(false)
       }
     }
@@ -144,13 +167,24 @@ export function CreditCardForm({
         }
       }
     }
-  }, [amount, onError, onTokenGenerated, selectedInstallments])
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [amount])
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (cardFormRef.current) {
       cardFormRef.current.submit()
     }
+  }
+
+  if (initError) {
+    return (
+      <div className="mt-4 rounded-lg border border-red-200 bg-red-50 p-4">
+        <p className="text-sm text-red-700">
+          Nao foi possivel carregar o formulario de cartao. Tente recarregar a pagina ou use outro metodo de pagamento.
+        </p>
+      </div>
+    )
   }
 
   return (

@@ -62,8 +62,13 @@ export default function OrdersPage() {
       try {
         const { orders: fetchedOrders } = await getCustomerOrders(token)
         setOrders(fetchedOrders || [])
-      } catch {
-        setError("Erro ao carregar pedidos.")
+      } catch (err: any) {
+        // Token expired or invalid - clear it
+        if (err?.message?.includes("401") || err?.message?.includes("Unauthorized")) {
+          localStorage.removeItem(AUTH_TOKEN_KEY)
+        } else {
+          setError("Erro ao carregar pedidos.")
+        }
       } finally {
         setLoading(false)
       }

@@ -682,13 +682,13 @@ export default function CheckoutPage() {
                 }}
               />
 
-              <div className={form.paymentMethod === "credit_card" ? "" : "hidden"}>
+              {form.paymentMethod === "credit_card" && total > 0 && (
                 <CreditCardForm
                   amount={total}
                   onTokenGenerated={handleCardToken}
                   onError={handleCardError}
                 />
-              </div>
+              )}
             </div>
           </section>
 
