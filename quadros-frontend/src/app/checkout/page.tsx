@@ -189,27 +189,55 @@ export default function CheckoutPage() {
     setCepLoading(true)
     setCepError("")
 
-    try {
-      const res = await fetch(`/api/cep/${digits}`)
-      const data: ViaCEPResponse = await res.json()
+    let found = false
 
-      if (data.erro) {
-        setCepError("CEP nao encontrado. Preencha o endereco manualmente.")
-      } else {
+    // Try BrasilAPI first (more reliable)
+    try {
+      const res = await fetch(`https://brasilapi.com.br/api/cep/v1/${digits}`)
+      if (res.ok) {
+        const data = await res.json()
         setForm((prev) => ({
           ...prev,
-          rua: data.logradouro || prev.rua,
-          bairro: data.bairro || prev.bairro,
-          cidade: data.localidade || prev.cidade,
-          estado: data.uf || prev.estado,
+          rua: data.street || prev.rua,
+          bairro: data.neighborhood || prev.bairro,
+          cidade: data.city || prev.cidade,
+          estado: data.state || prev.estado,
           shippingOptionId: "",
         }))
+        found = true
       }
     } catch {
-      setCepError("Nao foi possivel buscar o CEP. Preencha o endereco manualmente.")
-    } finally {
-      setCepLoading(false)
+      // BrasilAPI failed, try ViaCEP as fallback
     }
+
+    // Fallback to ViaCEP
+    if (!found) {
+      try {
+        const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`)
+        if (res.ok) {
+          const data = await res.json()
+          if (!data.erro) {
+            setForm((prev) => ({
+              ...prev,
+              rua: data.logradouro || prev.rua,
+              bairro: data.bairro || prev.bairro,
+              cidade: data.localidade || prev.cidade,
+              estado: data.uf || prev.estado,
+              shippingOptionId: "",
+            }))
+            found = true
+          }
+        }
+      } catch {
+        // Both APIs failed
+      }
+    }
+
+    if (!found) {
+      setCepError("Nao foi possivel buscar o CEP. Preencha o endereco manualmente.")
+    }
+
+    setCepLoading(false)
 
     // Always calculate shipping if we have a valid CEP
     fetchShippingOptions(digits)

@@ -270,6 +270,7 @@ export interface PaymentResult {
   qr_code_base64?: string
   ticket_url?: string
   barcode?: string
+  three_ds_url?: string
 }
 
 export interface PaymentStatus {
