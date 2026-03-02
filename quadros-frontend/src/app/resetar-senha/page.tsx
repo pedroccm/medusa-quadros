@@ -1,13 +1,13 @@
 "use client"
 
-import { FormEvent, useState } from "react"
+import { FormEvent, Suspense, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Loader2 } from "lucide-react"
 import { resetPassword } from "@/lib/medusa"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 
-export default function ResetPasswordPage() {
+function ResetPasswordContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const token = searchParams.get("token") || ""
@@ -52,20 +52,18 @@ export default function ResetPasswordPage() {
 
   if (success) {
     return (
-      <div className="mx-auto max-w-md px-4 py-16 sm:px-6">
-        <div className="rounded-lg border border-green-200 bg-green-50 p-6">
-          <p className="font-medium text-green-800">Senha redefinida!</p>
-          <p className="mt-2 text-sm text-green-700">
-            Sua senha foi alterada com sucesso. Voce sera redirecionado para o
-            login em instantes...
-          </p>
-        </div>
+      <div className="rounded-lg border border-green-200 bg-green-50 p-6">
+        <p className="font-medium text-green-800">Senha redefinida!</p>
+        <p className="mt-2 text-sm text-green-700">
+          Sua senha foi alterada com sucesso. Voce sera redirecionado para o
+          login em instantes...
+        </p>
       </div>
     )
   }
 
   return (
-    <div className="mx-auto max-w-md px-4 py-16 sm:px-6">
+    <>
       <h1 className="font-serif text-3xl text-[#1a1a1a]">Redefinir Senha</h1>
       <p className="mt-4 text-sm text-[#1a1a1a]/60">
         Digite sua nova senha abaixo.
@@ -117,6 +115,16 @@ export default function ResetPasswordPage() {
           )}
         </Button>
       </form>
+    </>
+  )
+}
+
+export default function ResetPasswordPage() {
+  return (
+    <div className="mx-auto max-w-md px-4 py-16 sm:px-6">
+      <Suspense fallback={<div className="text-sm text-[#1a1a1a]/50">Carregando...</div>}>
+        <ResetPasswordContent />
+      </Suspense>
     </div>
   )
 }

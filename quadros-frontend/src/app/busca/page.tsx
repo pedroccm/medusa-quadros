@@ -1,13 +1,13 @@
 "use client"
 
-import { useCallback, useEffect, useRef, useState } from "react"
+import { Suspense, useCallback, useEffect, useRef, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 import { Search, Loader2 } from "lucide-react"
 import { getProducts, type MedusaProduct } from "@/lib/medusa"
 import { ProductGrid } from "@/components/product/ProductGrid"
 import { Input } from "@/components/ui/input"
 
-export default function SearchPage() {
+function SearchContent() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const initialQuery = searchParams.get("q") || ""
@@ -62,9 +62,7 @@ export default function SearchPage() {
   }
 
   return (
-    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
-      <h1 className="font-serif text-3xl text-[#1a1a1a]">Buscar</h1>
-
+    <>
       <div className="relative mt-6 max-w-lg">
         <Search className="absolute left-3 top-1/2 size-4 -translate-y-1/2 text-[#1a1a1a]/40" />
         <Input
@@ -102,6 +100,17 @@ export default function SearchPage() {
           </>
         )}
       </div>
+    </>
+  )
+}
+
+export default function SearchPage() {
+  return (
+    <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
+      <h1 className="font-serif text-3xl text-[#1a1a1a]">Buscar</h1>
+      <Suspense fallback={<div className="mt-6 text-sm text-[#1a1a1a]/50">Carregando...</div>}>
+        <SearchContent />
+      </Suspense>
     </div>
   )
 }
