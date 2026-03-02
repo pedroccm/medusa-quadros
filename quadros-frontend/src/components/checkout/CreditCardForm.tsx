@@ -98,12 +98,15 @@ export function CreditCardForm({
     }
   }, [])
 
-  // Fetch installments when BIN (first 6 digits) changes
+  // Fetch installments when BIN (first 6 digits) or amount changes
   const prevBinRef = useRef("")
+  const prevAmountRef = useRef(0)
   useEffect(() => {
     const bin = cardNumber.replace(/\s/g, "").slice(0, 6)
-    if (bin.length < 6 || !mpRef.current || bin === prevBinRef.current) return
+    if (bin.length < 6 || !mpRef.current) return
+    if (bin === prevBinRef.current && amount === prevAmountRef.current) return
     prevBinRef.current = bin
+    prevAmountRef.current = amount
 
     mpRef.current
       .getInstallments({ amount: String(amount), bin })

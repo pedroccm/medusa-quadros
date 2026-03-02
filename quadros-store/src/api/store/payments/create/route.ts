@@ -64,7 +64,12 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     if (body.payment_method === "credit_card") {
       paymentBody.token = body.token
       paymentBody.installments = body.installments || 1
-      paymentBody.issuer_id = body.issuer_id
+      if (body.issuer_id) {
+        const parsedIssuerId = Number(body.issuer_id)
+        if (!isNaN(parsedIssuerId)) {
+          paymentBody.issuer_id = parsedIssuerId
+        }
+      }
     }
 
     if (body.payment_method === "pix") {
@@ -75,6 +80,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       paymentBody.payment_method_id = "bolbradesco"
     }
 
+    console.log("Creating MP payment with body:", JSON.stringify(paymentBody, null, 2))
     const payment = await paymentClient.create({ body: paymentBody as any })
 
     const result: Record<string, unknown> = {
@@ -96,11 +102,13 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
 
     res.json(result)
   } catch (error: any) {
-    console.error("Payment creation error:", error?.message || error)
+    console.error("Payment creation error:", JSON.stringify(error, null, 2))
+    console.error("Payment creation error message:", error?.message)
+    console.error("Payment creation error cause:", error?.cause)
     const status = error?.status || 500
     res.status(status).json({
       message: error?.message || "Failed to create payment",
-      cause: error?.cause,
+      cause: error?.cause || [],
     })
   }
 }
