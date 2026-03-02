@@ -188,9 +188,9 @@ export function CreditCardForm({
   }
 
   return (
-    <div className="mt-4">
+    <div className="relative mt-4">
       {loading && (
-        <div className="flex items-center justify-center py-8">
+        <div className="absolute inset-0 z-10 flex items-center justify-center bg-white/80">
           <Loader2 className="size-6 animate-spin text-[#1a1a1a]/40" />
           <span className="ml-2 text-sm text-[#1a1a1a]/50">
             Carregando formulario...
@@ -201,7 +201,7 @@ export function CreditCardForm({
         id="mp-card-form"
         ref={formRef}
         onSubmit={handleSubmit}
-        className={loading ? "hidden" : "space-y-4"}
+        className={`space-y-4 transition-opacity ${loading ? "opacity-0" : "opacity-100"}`}
       >
         <div>
           <label className="mb-1.5 block text-sm text-[#1a1a1a]/70">
