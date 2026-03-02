@@ -314,6 +314,7 @@ export default function CheckoutPage() {
           refreshCart()
           router.push("/pedido-confirmado?method=card")
         } else {
+          setCardTokenData(null)
           toast.error(
             `Pagamento ${result.status === "rejected" ? "recusado" : "nao aprovado"}. Tente novamente.`
           )
@@ -321,6 +322,7 @@ export default function CheckoutPage() {
       }
     } catch (error: any) {
       console.error("Payment error:", error)
+      setCardTokenData(null)
       toast.error(error?.message || "Erro ao processar pagamento. Tente novamente.")
     } finally {
       setSubmitting(false)
