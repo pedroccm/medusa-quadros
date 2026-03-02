@@ -47,7 +47,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     const paymentClient = new Payment(mpConfig)
 
     const paymentBody: Record<string, unknown> = {
-      transaction_amount: body.total,
+      transaction_amount: Math.round(body.total * 100) / 100,
       description: body.description || "Quadros Store - Pedido",
       payment_method_id: body.payment_method === "pix" ? "pix" : body.payment_method === "bolbradesco" ? "bolbradesco" : body.payment_method_id,
       payer: {

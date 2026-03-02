@@ -283,7 +283,7 @@ export default function CheckoutPage() {
         cart_id: cart.id,
         payment_method: form.paymentMethod,
         payer: buildPayerData(),
-        total,
+        total: Math.round(total * 100) / 100,
       }
 
       if (form.paymentMethod === "credit_card" && cardTokenData) {
@@ -682,13 +682,13 @@ export default function CheckoutPage() {
                 }}
               />
 
-              {form.paymentMethod === "credit_card" && (
+              <div className={form.paymentMethod === "credit_card" ? "" : "hidden"}>
                 <CreditCardForm
                   amount={total}
                   onTokenGenerated={handleCardToken}
                   onError={handleCardError}
                 />
-              )}
+              </div>
             </div>
           </section>
 
