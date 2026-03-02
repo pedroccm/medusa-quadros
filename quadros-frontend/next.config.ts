@@ -26,6 +26,7 @@ const nextConfig: NextConfig = {
       { source: "/auth/:path*", destination: `${MEDUSA_BACKEND_URL}/auth/:path*` },
       { source: "/admin/:path*", destination: `${MEDUSA_BACKEND_URL}/admin/:path*` },
       { source: "/health", destination: `${MEDUSA_BACKEND_URL}/health` },
+      { source: "/api/cep/:cep", destination: "https://viacep.com.br/ws/:cep/json/" },
     ];
   },
 };

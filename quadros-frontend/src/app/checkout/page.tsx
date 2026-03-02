@@ -190,7 +190,7 @@ export default function CheckoutPage() {
     setCepError("")
 
     try {
-      const res = await fetch(`https://viacep.com.br/ws/${digits}/json/`)
+      const res = await fetch(`/api/cep/${digits}`)
       const data: ViaCEPResponse = await res.json()
 
       if (data.erro) {
