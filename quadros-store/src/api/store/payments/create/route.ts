@@ -119,6 +119,9 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     if (body.payment_method === "credit_card") {
       paymentBody.token = body.token
       paymentBody.installments = body.installments || 1
+      paymentBody.binary_mode = false
+      paymentBody.three_d_secure_mode = "optional"
+      paymentBody.callback_url = "https://quadros-loja.netlify.app/checkout"
       if (body.issuer_id) {
         const parsedIssuerId = Number(body.issuer_id)
         if (!isNaN(parsedIssuerId)) {
@@ -162,6 +165,11 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       payment_id: payment.id,
       status: payment.status,
       status_detail: payment.status_detail,
+    }
+
+    // 3DS challenge URL (when three_d_secure_mode is enabled)
+    if (payment.three_ds_info?.external_resource_url) {
+      result.three_ds_url = payment.three_ds_info.external_resource_url
     }
 
     if (body.payment_method === "pix" && payment.point_of_interaction?.transaction_data) {

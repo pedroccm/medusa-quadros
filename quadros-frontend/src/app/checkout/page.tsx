@@ -321,6 +321,13 @@ export default function CheckoutPage() {
           localStorage.removeItem("quadros_cart_id")
           refreshCart()
           router.push("/pedido-confirmado?method=card")
+        } else if (result.three_ds_url) {
+          // 3D Secure challenge - redirect user to bank verification
+          window.location.href = result.three_ds_url
+        } else if (result.status === "in_process") {
+          localStorage.removeItem("quadros_cart_id")
+          refreshCart()
+          router.push("/pedido-confirmado?method=card&pending=true")
         } else {
           setCardTokenData(null)
           toast.error(
