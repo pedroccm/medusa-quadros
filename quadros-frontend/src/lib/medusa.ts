@@ -121,17 +121,22 @@ async function medusaFetch<T = Record<string, unknown>>(
 export async function getProducts(
   params?: Record<string, string>
 ): Promise<{ products: MedusaProduct[]; count: number; offset: number; limit: number }> {
-  const queryString = params
-    ? "?" + new URLSearchParams(params).toString()
-    : ""
+  const regionId = await getDefaultRegionId()
+  const merged: Record<string, string> = {
+    region_id: regionId,
+    "fields": "*variants.calculated_price",
+    ...params,
+  }
+  const queryString = "?" + new URLSearchParams(merged).toString()
   return medusaFetch(`/store/products${queryString}`)
 }
 
 export async function getProduct(
   handle: string
 ): Promise<MedusaProduct | null> {
+  const regionId = await getDefaultRegionId()
   const data = await medusaFetch<{ products: MedusaProduct[] }>(
-    `/store/products?handle=${handle}`
+    `/store/products?handle=${handle}&region_id=${regionId}&fields=*variants.calculated_price`
   )
   return data.products?.[0] || null
 }
