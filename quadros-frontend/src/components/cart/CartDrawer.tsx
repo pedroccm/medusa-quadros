@@ -85,7 +85,7 @@ function CartItemRow({ item }: { item: MedusaLineItem }) {
 
           {/* Price */}
           <span className="text-sm text-[#1a1a1a]">
-            {formatPrice(item.total)}
+            {formatPrice(item.total ?? item.unit_price * item.quantity)}
           </span>
         </div>
       </div>

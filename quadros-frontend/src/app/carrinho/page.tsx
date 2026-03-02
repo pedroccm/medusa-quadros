@@ -96,7 +96,7 @@ function CartItemRow({ item }: { item: MedusaLineItem }) {
           {/* Prices */}
           <div className="text-right">
             <p className="text-sm font-medium text-[#1a1a1a]">
-              {formatPrice(item.total)}
+              {formatPrice(item.total ?? item.unit_price * item.quantity)}
             </p>
             {item.quantity > 1 && (
               <p className="text-xs text-[#1a1a1a]/50">

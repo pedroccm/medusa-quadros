@@ -61,7 +61,7 @@ export interface MedusaLineItem {
   thumbnail: string | null
   quantity: number
   unit_price: number
-  total: number
+  total: number | null
   variant_id: string
   variant: MedusaVariant | null
   product: MedusaProduct | null
