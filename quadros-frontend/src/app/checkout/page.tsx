@@ -600,9 +600,9 @@ export default function CheckoutPage() {
                 </label>
                 <Input
                   value={form.cidade}
-                  disabled
+                  onChange={(e) => updateField("cidade", e.target.value)}
                   placeholder="Cidade"
-                  className="border-[#e5e5e5] bg-[#fafafa]"
+                  className="border-[#e5e5e5]"
                 />
               </div>
 
@@ -613,9 +613,10 @@ export default function CheckoutPage() {
                 </label>
                 <Input
                   value={form.estado}
-                  disabled
+                  onChange={(e) => updateField("estado", e.target.value)}
                   placeholder="UF"
-                  className="border-[#e5e5e5] bg-[#fafafa]"
+                  maxLength={2}
+                  className="border-[#e5e5e5]"
                 />
               </div>
             </div>
