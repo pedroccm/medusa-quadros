@@ -3,7 +3,7 @@
   publish = ".next"
 
 [build.environment]
-  NODE_VERSION = "20"
+  NODE_VERSION = "22"
   NEXT_PUBLIC_MEDUSA_BACKEND_URL = "http://165.227.197.59:9000"
   NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY = "pk_c2f5589f16eddc02305bfabd1ae20902c62bd43d2ef5ea7070310fd4f7f2b9e1"
 
