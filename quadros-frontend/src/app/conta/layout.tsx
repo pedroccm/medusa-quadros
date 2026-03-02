@@ -2,13 +2,15 @@
 
 import Link from "next/link"
 import { usePathname, useRouter } from "next/navigation"
-import { User, Package, LogOut } from "lucide-react"
+import { User, Package, Mail, MapPin, LogOut } from "lucide-react"
 import { ProtectedRoute } from "@/components/auth/ProtectedRoute"
 import { useAuth } from "@/context/AuthContext"
 
 const sidebarLinks = [
   { label: "Meus Dados", href: "/conta/dados", icon: User },
   { label: "Meus Pedidos", href: "/conta/pedidos", icon: Package },
+  { label: "Enderecos", href: "/conta/enderecos", icon: MapPin },
+  { label: "E-mails", href: "/conta/emails", icon: Mail },
 ]
 
 export default function AccountLayout({

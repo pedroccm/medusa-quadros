@@ -232,6 +232,85 @@ export async function completeCart(
   })
 }
 
+// --- Payments (Mercado Pago) ---
+
+export interface CreatePaymentRequest {
+  cart_id: string
+  payment_method: "pix" | "credit_card" | "bolbradesco"
+  payer: {
+    email: string
+    first_name: string
+    last_name: string
+    identification: {
+      type: string
+      number: string
+    }
+  }
+  total: number
+  description?: string
+  token?: string
+  installments?: number
+  payment_method_id?: string
+  issuer_id?: string
+}
+
+export interface PaymentResult {
+  payment_id: number
+  status: string
+  status_detail: string
+  qr_code?: string
+  qr_code_base64?: string
+  ticket_url?: string
+  barcode?: string
+}
+
+export interface PaymentStatus {
+  payment_id: number
+  status: string
+  status_detail: string
+}
+
+export async function createPayment(
+  data: CreatePaymentRequest
+): Promise<PaymentResult> {
+  return medusaFetch("/store/payments/create", {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function getPaymentStatus(
+  paymentId: string
+): Promise<PaymentStatus> {
+  return medusaFetch(`/store/payments/${paymentId}/status`)
+}
+
+// --- Shipping Calculation (Melhor Envio) ---
+
+export interface ShippingCalculateItem {
+  quantity: number
+  variant_title: string
+}
+
+export interface ShippingCalculateOption {
+  id: string
+  name: string
+  company: string
+  price: number
+  delivery_min: number
+  delivery_max: number
+}
+
+export async function calculateShipping(
+  to_cep: string,
+  items: ShippingCalculateItem[]
+): Promise<{ shipping_options: ShippingCalculateOption[] }> {
+  return medusaFetch("/store/shipping/calculate", {
+    method: "POST",
+    body: JSON.stringify({ to_cep, items }),
+  })
+}
+
 // --- Formatting ---
 
 export function formatPrice(
@@ -351,6 +430,68 @@ export async function updateCustomerMe(
   })
 }
 
+// --- Password Reset ---
+
+export async function requestPasswordReset(
+  email: string
+): Promise<void> {
+  await medusaFetch("/auth/customer/emailpass/reset-password", {
+    method: "POST",
+    body: JSON.stringify({ identifier: email }),
+  })
+}
+
+export async function resetPassword(
+  email: string,
+  token: string,
+  password: string
+): Promise<void> {
+  await medusaFetch("/auth/customer/emailpass/update", {
+    method: "POST",
+    body: JSON.stringify({ email, token, password }),
+  })
+}
+
+// --- Customer Addresses ---
+
+export async function getCustomerAddresses(
+  token: string
+): Promise<{ addresses: MedusaAddress[] }> {
+  return medusaAuthFetch("/store/customers/me/addresses", token)
+}
+
+export async function addCustomerAddress(
+  token: string,
+  data: Partial<MedusaAddress>
+): Promise<{ address: MedusaAddress }> {
+  return medusaAuthFetch("/store/customers/me/addresses", token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function updateCustomerAddress(
+  token: string,
+  addressId: string,
+  data: Partial<MedusaAddress>
+): Promise<{ address: MedusaAddress }> {
+  return medusaAuthFetch(`/store/customers/me/addresses/${addressId}`, token, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function deleteCustomerAddress(
+  token: string,
+  addressId: string
+): Promise<void> {
+  await medusaAuthFetch(`/store/customers/me/addresses/${addressId}`, token, {
+    method: "DELETE",
+  })
+}
+
+// --- Customer Orders ---
+
 export async function getCustomerOrders(
   token: string
 ): Promise<{ orders: MedusaOrder[]; count: number }> {
@@ -362,4 +503,79 @@ export async function getCustomerOrder(
   orderId: string
 ): Promise<{ order: MedusaOrder }> {
   return medusaAuthFetch(`/store/orders/${orderId}`, token)
+}
+
+// --- Admin Auth & Email Settings ---
+
+export interface EmailSettings {
+  from_email: string
+  from_name: string
+  enabled: {
+    order_placed: boolean
+    order_shipped: boolean
+    welcome: boolean
+  }
+}
+
+export async function loginAdmin(
+  email: string,
+  password: string
+): Promise<{ token: string }> {
+  return medusaFetch("/auth/user/emailpass", {
+    method: "POST",
+    body: JSON.stringify({ email, password }),
+  })
+}
+
+async function adminFetch<T = Record<string, unknown>>(
+  endpoint: string,
+  token: string,
+  options: RequestInit = {}
+): Promise<T> {
+  const res = await fetch(`${MEDUSA_BACKEND_URL}${endpoint}`, {
+    ...options,
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${token}`,
+      ...options.headers,
+    },
+  })
+
+  if (!res.ok) {
+    const errorBody = await res.text()
+    throw new Error(`Admin API error ${res.status}: ${errorBody}`)
+  }
+
+  if (res.status === 204 || res.headers.get("content-length") === "0") {
+    return {} as T
+  }
+
+  return res.json()
+}
+
+export async function getEmailSettings(
+  adminToken: string
+): Promise<{ email_settings: EmailSettings }> {
+  return adminFetch("/admin/email-settings", adminToken)
+}
+
+export async function updateEmailSettings(
+  adminToken: string,
+  settings: EmailSettings
+): Promise<{ email_settings: EmailSettings }> {
+  return adminFetch("/admin/email-settings", adminToken, {
+    method: "POST",
+    body: JSON.stringify(settings),
+  })
+}
+
+export async function sendTestEmail(
+  adminToken: string,
+  emailType: string,
+  toEmail: string
+): Promise<{ success: boolean; message: string }> {
+  return adminFetch("/admin/email-settings/test", adminToken, {
+    method: "POST",
+    body: JSON.stringify({ email_type: emailType, to_email: toEmail }),
+  })
 }

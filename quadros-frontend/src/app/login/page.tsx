@@ -71,6 +71,15 @@ export default function LoginPage() {
           />
         </div>
 
+        <div className="flex justify-end">
+          <Link
+            href="/esqueci-senha"
+            className="text-sm text-[#1a1a1a]/60 underline underline-offset-4 transition-colors hover:text-[#1a1a1a]"
+          >
+            Esqueceu a senha?
+          </Link>
+        </div>
+
         {error && (
           <p className="text-sm text-red-600">{error}</p>
         )}

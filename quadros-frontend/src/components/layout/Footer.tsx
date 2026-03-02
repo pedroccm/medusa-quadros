@@ -18,11 +18,10 @@ const linkColumns = [
     ],
   },
   {
-    title: "Redes Sociais",
+    title: "Legal",
     links: [
-      { label: "Instagram", href: "#" },
-      { label: "Facebook", href: "#" },
-      { label: "Pinterest", href: "#" },
+      { label: "Politica de Privacidade", href: "/privacidade" },
+      { label: "Termos de Uso", href: "/termos" },
     ],
   },
 ]
@@ -69,7 +68,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-xs text-white/40">
-            2025 Quadros Store. Todos os direitos reservados.
+            {new Date().getFullYear()} Quadros Store. Todos os direitos reservados.
           </p>
         </div>
       </div>

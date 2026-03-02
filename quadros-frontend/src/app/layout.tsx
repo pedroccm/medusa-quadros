@@ -1,10 +1,12 @@
 import type { Metadata } from "next"
+import Script from "next/script"
 import { Playfair_Display, Inter } from "next/font/google"
 import { Providers } from "./providers"
 import { Header } from "@/components/layout/Header"
 import { Footer } from "@/components/layout/Footer"
 import { CartDrawer } from "@/components/cart/CartDrawer"
 import { Toaster } from "@/components/ui/sonner"
+import { CookieConsent } from "@/components/CookieConsent"
 import "./globals.css"
 
 const playfairDisplay = Playfair_Display({
@@ -20,9 +22,23 @@ const inter = Inter({
 })
 
 export const metadata: Metadata = {
-  title: "Quadros Store - Quadros Decorativos",
+  metadataBase: new URL(
+    process.env.NEXT_PUBLIC_SITE_URL || "https://quadrosstore.com.br"
+  ),
+  title: {
+    default: "Quadros Store - Quadros Decorativos",
+    template: "%s | Quadros Store",
+  },
   description:
     "Quadros decorativos para transformar seus ambientes. Arte impressa com qualidade premium.",
+  openGraph: {
+    title: "Quadros Store - Quadros Decorativos",
+    description:
+      "Quadros decorativos para transformar seus ambientes. Arte impressa com qualidade premium.",
+    type: "website",
+    locale: "pt_BR",
+    siteName: "Quadros Store",
+  },
 }
 
 export default function RootLayout({
@@ -32,6 +48,10 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="pt-BR">
+      <Script
+        src="https://sdk.mercadopago.com/js/v2"
+        strategy="beforeInteractive"
+      />
       <body
         className={`${playfairDisplay.variable} ${inter.variable} font-sans bg-[#fafafa] text-[#1a1a1a] antialiased min-h-screen flex flex-col`}
       >
@@ -41,6 +61,7 @@ export default function RootLayout({
           <Footer />
           <CartDrawer />
           <Toaster />
+          <CookieConsent />
         </Providers>
       </body>
     </html>

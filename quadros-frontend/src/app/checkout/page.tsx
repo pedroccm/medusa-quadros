@@ -1,24 +1,20 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
-import { ArrowLeft, Loader2, Truck, CreditCard, CheckCircle2 } from "lucide-react"
+import { ArrowLeft, Loader2, Truck } from "lucide-react"
 import { toast } from "sonner"
 import { useCart } from "@/context/CartContext"
-import { formatPrice } from "@/lib/medusa"
+import { formatPrice, createPayment, calculateShipping } from "@/lib/medusa"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-  DialogFooter,
-} from "@/components/ui/dialog"
+import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector"
+import { CreditCardForm } from "@/components/checkout/CreditCardForm"
+import { PixPayment } from "@/components/checkout/PixPayment"
+import { BoletoPayment } from "@/components/checkout/BoletoPayment"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -36,17 +32,21 @@ interface ViaCEPResponse {
 
 interface ShippingOption {
   id: string
-  label: string
+  name: string
+  company: string
   price: number
-  estimatedDays: string
+  delivery_min: number
+  delivery_max: number
 }
 
+type PaymentMethod = "pix" | "credit_card" | "bolbradesco"
+type PaymentStep = "form" | "awaiting_pix" | "awaiting_boleto"
+
 interface FormData {
-  // Dados pessoais
   nome: string
   email: string
   telefone: string
-  // Endereco
+  cpf: string
   cep: string
   rua: string
   numero: string
@@ -54,62 +54,19 @@ interface FormData {
   bairro: string
   cidade: string
   estado: string
-  // Frete
   shippingOptionId: string
+  paymentMethod: PaymentMethod
+}
+
+interface CardTokenData {
+  token: string
+  installments: number
+  payment_method_id: string
+  issuer_id: string
 }
 
 // ---------------------------------------------------------------------------
-// Shipping calculation helpers
-// ---------------------------------------------------------------------------
-
-const SP_CAPITAL_CEPS = [
-  "01", "02", "03", "04", "05", "06", "07", "08",
-]
-
-function isSpCapital(cep: string): boolean {
-  const clean = cep.replace(/\D/g, "")
-  const prefix = clean.substring(0, 2)
-  return clean.startsWith("0") && SP_CAPITAL_CEPS.includes(prefix)
-}
-
-function calculateShippingOptions(
-  estado: string,
-  cep: string,
-  subtotal: number
-): ShippingOption[] {
-  const isFreeShipping = subtotal >= 199
-
-  let basePrice: number
-  let estimatedDays: string
-
-  if (estado === "SP" && isSpCapital(cep)) {
-    basePrice = 12.9
-    estimatedDays = "3-5 dias uteis"
-  } else if (estado === "SP") {
-    basePrice = 18.9
-    estimatedDays = "5-7 dias uteis"
-  } else if (["RJ", "MG", "ES"].includes(estado)) {
-    basePrice = 22.9
-    estimatedDays = "7-10 dias uteis"
-  } else {
-    basePrice = 29.9
-    estimatedDays = "10-15 dias uteis"
-  }
-
-  const options: ShippingOption[] = [
-    {
-      id: "standard",
-      label: "Frete Padrao",
-      price: isFreeShipping ? 0 : basePrice,
-      estimatedDays,
-    },
-  ]
-
-  return options
-}
-
-// ---------------------------------------------------------------------------
-// CEP mask
+// Masks
 // ---------------------------------------------------------------------------
 
 function maskCEP(value: string): string {
@@ -118,15 +75,20 @@ function maskCEP(value: string): string {
   return `${digits.slice(0, 5)}-${digits.slice(5)}`
 }
 
-// ---------------------------------------------------------------------------
-// Phone mask (optional convenience)
-// ---------------------------------------------------------------------------
-
 function maskPhone(value: string): string {
   const digits = value.replace(/\D/g, "").slice(0, 11)
   if (digits.length <= 2) return digits
   if (digits.length <= 7) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`
   return `(${digits.slice(0, 2)}) ${digits.slice(2, 7)}-${digits.slice(7)}`
+}
+
+function maskCPF(value: string): string {
+  const digits = value.replace(/\D/g, "").slice(0, 11)
+  if (digits.length <= 3) return digits
+  if (digits.length <= 6) return `${digits.slice(0, 3)}.${digits.slice(3)}`
+  if (digits.length <= 9)
+    return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6)}`
+  return `${digits.slice(0, 3)}.${digits.slice(3, 6)}.${digits.slice(6, 9)}-${digits.slice(9)}`
 }
 
 // ---------------------------------------------------------------------------
@@ -144,6 +106,7 @@ export default function CheckoutPage() {
     nome: "",
     email: "",
     telefone: "",
+    cpf: "",
     cep: "",
     rua: "",
     numero: "",
@@ -152,28 +115,29 @@ export default function CheckoutPage() {
     cidade: "",
     estado: "",
     shippingOptionId: "",
+    paymentMethod: "pix",
   })
 
   const [cepLoading, setCepLoading] = useState(false)
   const [cepError, setCepError] = useState("")
+  const [shippingOptions, setShippingOptions] = useState<ShippingOption[]>([])
+  const [shippingLoading, setShippingLoading] = useState(false)
+  const [shippingError, setShippingError] = useState("")
   const [submitting, setSubmitting] = useState(false)
-  const [successOpen, setSuccessOpen] = useState(false)
 
-  // Derived shipping options based on state
-  const shippingOptions = useMemo(() => {
-    if (!form.estado) return []
-    return calculateShippingOptions(form.estado, form.cep, subtotal)
-  }, [form.estado, form.cep, subtotal])
-
-  // Auto-select first shipping option when available
-  useEffect(() => {
-    if (shippingOptions.length > 0 && !form.shippingOptionId) {
-      setForm((prev) => ({
-        ...prev,
-        shippingOptionId: shippingOptions[0].id,
-      }))
-    }
-  }, [shippingOptions, form.shippingOptionId])
+  // Payment states
+  const [paymentStep, setPaymentStep] = useState<PaymentStep>("form")
+  const [pixData, setPixData] = useState<{
+    paymentId: string
+    qrCode: string
+    qrCodeBase64: string
+  } | null>(null)
+  const [boletoData, setBoletoData] = useState<{
+    barcode: string
+    ticketUrl: string
+  } | null>(null)
+  const [cardTokenData, setCardTokenData] = useState<CardTokenData | null>(null)
+  const cardFormRef = useRef<{ submit: () => void } | null>(null)
 
   const selectedShipping = shippingOptions.find(
     (o) => o.id === form.shippingOptionId
@@ -191,6 +155,32 @@ export default function CheckoutPage() {
   )
 
   // ------- CEP lookup -------
+
+  const fetchShippingOptions = useCallback(async (cep: string) => {
+    setShippingLoading(true)
+    setShippingError("")
+    setShippingOptions([])
+    setForm((prev) => ({ ...prev, shippingOptionId: "" }))
+
+    try {
+      const shippingItems = items.map((item) => ({
+        quantity: item.quantity,
+        variant_title: item.variant?.title || item.title || "",
+      }))
+
+      const data = await calculateShipping(cep, shippingItems)
+      const options: ShippingOption[] = data.shipping_options
+
+      setShippingOptions(options)
+      if (options.length > 0) {
+        setForm((prev) => ({ ...prev, shippingOptionId: options[0].id }))
+      }
+    } catch {
+      setShippingError("Erro ao calcular frete. Tente novamente.")
+    } finally {
+      setShippingLoading(false)
+    }
+  }, [items])
 
   const fetchCEP = useCallback(async (cep: string) => {
     const digits = cep.replace(/\D/g, "")
@@ -214,14 +204,17 @@ export default function CheckoutPage() {
         bairro: data.bairro || prev.bairro,
         cidade: data.localidade || prev.cidade,
         estado: data.uf || prev.estado,
-        shippingOptionId: "", // reset to recalculate
+        shippingOptionId: "",
       }))
+
+      // Fetch real shipping options from Melhor Envio
+      fetchShippingOptions(digits)
     } catch {
       setCepError("Erro ao buscar CEP. Tente novamente.")
     } finally {
       setCepLoading(false)
     }
-  }, [])
+  }, [fetchShippingOptions])
 
   // ------- Validation -------
 
@@ -230,6 +223,7 @@ export default function CheckoutPage() {
       form.nome.trim().length > 0 &&
       form.email.trim().length > 0 &&
       form.telefone.replace(/\D/g, "").length >= 10 &&
+      form.cpf.replace(/\D/g, "").length === 11 &&
       form.cep.replace(/\D/g, "").length === 8 &&
       form.rua.trim().length > 0 &&
       form.numero.trim().length > 0 &&
@@ -240,6 +234,23 @@ export default function CheckoutPage() {
     )
   }, [form])
 
+  // ------- Build payer data -------
+
+  const buildPayerData = useCallback(() => {
+    const nameParts = form.nome.trim().split(" ")
+    const firstName = nameParts[0] || ""
+    const lastName = nameParts.slice(1).join(" ") || firstName
+    return {
+      email: form.email,
+      first_name: firstName,
+      last_name: lastName,
+      identification: {
+        type: "CPF",
+        number: form.cpf.replace(/\D/g, ""),
+      },
+    }
+  }, [form.nome, form.email, form.cpf])
+
   // ------- Submit -------
 
   const handleSubmit = useCallback(async () => {
@@ -248,21 +259,98 @@ export default function CheckoutPage() {
       return
     }
 
+    if (!cart?.id) {
+      toast.error("Carrinho nao encontrado.")
+      return
+    }
+
+    // For credit card, we need the token first
+    if (form.paymentMethod === "credit_card" && !cardTokenData) {
+      // Trigger the card form submission via the MercadoPago SDK
+      const cardForm = document.getElementById("mp-card-form") as HTMLFormElement
+      if (cardForm) {
+        cardForm.requestSubmit()
+      } else {
+        toast.error("Preencha os dados do cartao.")
+      }
+      return
+    }
+
     setSubmitting(true)
 
-    // Simulate order placement (Mercado Pago integration placeholder)
-    await new Promise((resolve) => setTimeout(resolve, 1500))
+    try {
+      const paymentData: any = {
+        cart_id: cart.id,
+        payment_method: form.paymentMethod,
+        payer: buildPayerData(),
+        total,
+      }
 
-    setSubmitting(false)
-    setSuccessOpen(true)
-  }, [isFormValid])
+      if (form.paymentMethod === "credit_card" && cardTokenData) {
+        paymentData.token = cardTokenData.token
+        paymentData.installments = cardTokenData.installments
+        paymentData.payment_method_id = cardTokenData.payment_method_id
+        paymentData.issuer_id = cardTokenData.issuer_id
+      }
 
-  const handleSuccessClose = useCallback(() => {
-    setSuccessOpen(false)
-    // Clear cart from localStorage
+      const result = await createPayment(paymentData)
+
+      if (form.paymentMethod === "pix") {
+        setPixData({
+          paymentId: String(result.payment_id),
+          qrCode: result.qr_code || "",
+          qrCodeBase64: result.qr_code_base64 || "",
+        })
+        setPaymentStep("awaiting_pix")
+      } else if (form.paymentMethod === "bolbradesco") {
+        setBoletoData({
+          barcode: result.barcode || "",
+          ticketUrl: result.ticket_url || "",
+        })
+        setPaymentStep("awaiting_boleto")
+      } else if (form.paymentMethod === "credit_card") {
+        if (result.status === "approved") {
+          localStorage.removeItem("quadros_cart_id")
+          refreshCart()
+          router.push("/pedido-confirmado?method=card")
+        } else {
+          toast.error(
+            `Pagamento ${result.status === "rejected" ? "recusado" : "nao aprovado"}. Tente novamente.`
+          )
+        }
+      }
+    } catch (error: any) {
+      console.error("Payment error:", error)
+      toast.error(error?.message || "Erro ao processar pagamento. Tente novamente.")
+    } finally {
+      setSubmitting(false)
+    }
+  }, [isFormValid, cart?.id, form.paymentMethod, cardTokenData, buildPayerData, total, refreshCart, router])
+
+  // Handle card token generated (from CreditCardForm)
+  const handleCardToken = useCallback(
+    (data: CardTokenData) => {
+      setCardTokenData(data)
+    },
+    []
+  )
+
+  // Auto-submit when card token is generated
+  useEffect(() => {
+    if (cardTokenData && form.paymentMethod === "credit_card") {
+      handleSubmit()
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [cardTokenData])
+
+  const handleCardError = useCallback((message: string) => {
+    toast.error(message)
+  }, [])
+
+  const handlePixConfirmed = useCallback(() => {
     localStorage.removeItem("quadros_cart_id")
     refreshCart()
-    router.push("/loja")
+    router.push("/pedido-confirmado?method=pix")
   }, [refreshCart, router])
 
   // ------- Render -------
@@ -272,7 +360,7 @@ export default function CheckoutPage() {
       <div className="mx-auto max-w-7xl px-4 py-16 sm:px-6 lg:px-8">
         <div className="flex flex-col items-center justify-center gap-6">
           <p className="text-lg text-[#1a1a1a]/50">
-            Seu carrinho está vazio. Adicione produtos antes de finalizar a compra.
+            Seu carrinho esta vazio. Adicione produtos antes de finalizar a compra.
           </p>
           <Button
             asChild
@@ -280,6 +368,51 @@ export default function CheckoutPage() {
           >
             <Link href="/loja">Explorar produtos</Link>
           </Button>
+        </div>
+      </div>
+    )
+  }
+
+  // Awaiting async payment (Pix or Boleto)
+  if (paymentStep === "awaiting_pix" && pixData) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-10 sm:px-6">
+        <h1 className="text-center font-serif text-2xl text-[#1a1a1a]">
+          Pagamento via Pix
+        </h1>
+        <div className="mt-6 rounded-lg border border-[#e5e5e5] bg-white p-6">
+          <PixPayment
+            paymentId={pixData.paymentId}
+            qrCode={pixData.qrCode}
+            qrCodeBase64={pixData.qrCodeBase64}
+            onConfirmed={handlePixConfirmed}
+          />
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-[#1a1a1a]/50">
+            Total: <strong>{formatPrice(total)}</strong>
+          </p>
+        </div>
+      </div>
+    )
+  }
+
+  if (paymentStep === "awaiting_boleto" && boletoData) {
+    return (
+      <div className="mx-auto max-w-lg px-4 py-10 sm:px-6">
+        <h1 className="text-center font-serif text-2xl text-[#1a1a1a]">
+          Pagamento via Boleto
+        </h1>
+        <div className="mt-6 rounded-lg border border-[#e5e5e5] bg-white p-6">
+          <BoletoPayment
+            barcode={boletoData.barcode}
+            ticketUrl={boletoData.ticketUrl}
+          />
+        </div>
+        <div className="mt-4 text-center">
+          <p className="text-sm text-[#1a1a1a]/50">
+            Total: <strong>{formatPrice(total)}</strong>
+          </p>
         </div>
       </div>
     )
@@ -343,6 +476,20 @@ export default function CheckoutPage() {
                     updateField("telefone", maskPhone(e.target.value))
                   }
                   placeholder="(11) 99999-9999"
+                  className="border-[#e5e5e5]"
+                />
+              </div>
+              <div>
+                <label className="mb-1.5 block text-sm text-[#1a1a1a]/70">
+                  CPF *
+                </label>
+                <Input
+                  value={form.cpf}
+                  onChange={(e) =>
+                    updateField("cpf", maskCPF(e.target.value))
+                  }
+                  placeholder="000.000.000-00"
+                  maxLength={14}
                   className="border-[#e5e5e5]"
                 />
               </div>
@@ -469,17 +616,19 @@ export default function CheckoutPage() {
           <section>
             <h2 className="font-serif text-lg text-[#1a1a1a]">Frete</h2>
 
-            {!form.estado ? (
+            {shippingLoading ? (
+              <div className="mt-4 flex items-center gap-2 text-sm text-[#1a1a1a]/60">
+                <Loader2 className="size-4 animate-spin" />
+                Calculando frete...
+              </div>
+            ) : shippingError ? (
+              <p className="mt-4 text-sm text-red-600">{shippingError}</p>
+            ) : shippingOptions.length === 0 ? (
               <p className="mt-4 text-sm text-[#1a1a1a]/50">
-                Informe o CEP acima para calcular o frete.
+                Informe o CEP para calcular o frete.
               </p>
             ) : (
               <div className="mt-4 space-y-3">
-                {subtotal >= 199 && (
-                  <p className="text-sm font-medium text-green-700">
-                    Frete gratis para compras acima de R$ 199,00!
-                  </p>
-                )}
                 {shippingOptions.map((option) => (
                   <label
                     key={option.id}
@@ -502,16 +651,16 @@ export default function CheckoutPage() {
                     <Truck className="size-5 shrink-0 text-[#1a1a1a]/60" />
                     <div className="flex-1">
                       <p className="text-sm font-medium text-[#1a1a1a]">
-                        {option.label}
+                        {option.name} - {option.company}
                       </p>
                       <p className="text-xs text-[#1a1a1a]/50">
-                        Entrega estimada: {option.estimatedDays}
+                        {option.delivery_min === option.delivery_max
+                          ? `${option.delivery_min} dias uteis`
+                          : `${option.delivery_min}-${option.delivery_max} dias uteis`}
                       </p>
                     </div>
                     <span className="text-sm font-medium text-[#1a1a1a]">
-                      {option.price === 0
-                        ? "Gratis"
-                        : formatPrice(option.price)}
+                      {formatPrice(option.price)}
                     </span>
                   </label>
                 ))}
@@ -524,24 +673,22 @@ export default function CheckoutPage() {
           {/* ------- Section 4: Pagamento ------- */}
           <section>
             <h2 className="font-serif text-lg text-[#1a1a1a]">Pagamento</h2>
-            <div className="mt-4 rounded-lg border border-[#e5e5e5] bg-white p-6">
-              <div className="flex items-center gap-3">
-                <CreditCard className="size-6 text-[#1a1a1a]/60" />
-                <div>
-                  <p className="text-sm font-medium text-[#1a1a1a]">
-                    Pagamento via Mercado Pago
-                  </p>
-                  <p className="mt-0.5 text-xs text-[#1a1a1a]/50">
-                    (Integracao em breve)
-                  </p>
-                </div>
-              </div>
-              <Button
-                disabled
-                className="mt-4 w-full bg-[#009ee3] text-white hover:bg-[#009ee3]/90 disabled:opacity-60"
-              >
-                Pagar com Mercado Pago
-              </Button>
+            <div className="mt-4">
+              <PaymentMethodSelector
+                selected={form.paymentMethod}
+                onChange={(method) => {
+                  updateField("paymentMethod", method)
+                  setCardTokenData(null)
+                }}
+              />
+
+              {form.paymentMethod === "credit_card" && (
+                <CreditCardForm
+                  amount={total}
+                  onTokenGenerated={handleCardToken}
+                  onError={handleCardError}
+                />
+              )}
             </div>
           </section>
 
@@ -555,10 +702,10 @@ export default function CheckoutPage() {
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
-                  Processando...
+                  Processando pagamento...
                 </>
               ) : (
-                "Confirmar Pedido"
+                `Pagar ${formatPrice(total)}`
               )}
             </Button>
           </div>
@@ -621,10 +768,10 @@ export default function CheckoutPage() {
               <div className="flex items-center justify-between text-sm">
                 <span className="text-[#1a1a1a]/60">Frete</span>
                 <span className="text-[#1a1a1a]">
-                  {!form.estado
-                    ? "Informe o CEP"
-                    : shippingPrice === 0
-                      ? "Gratis"
+                  {shippingLoading
+                    ? "Calculando..."
+                    : shippingOptions.length === 0
+                      ? "Informe o CEP"
                       : formatPrice(shippingPrice)}
                 </span>
               </div>
@@ -650,43 +797,16 @@ export default function CheckoutPage() {
               {submitting ? (
                 <>
                   <Loader2 className="mr-2 size-4 animate-spin" />
-                  Processando...
+                  Processando pagamento...
                 </>
               ) : (
-                "Confirmar Pedido"
+                `Pagar ${formatPrice(total)}`
               )}
             </Button>
           </div>
         </div>
       </div>
 
-      {/* ============================================================ */}
-      {/* Success dialog */}
-      {/* ============================================================ */}
-      <Dialog open={successOpen} onOpenChange={setSuccessOpen}>
-        <DialogContent className="bg-white sm:max-w-md">
-          <DialogHeader>
-            <div className="mx-auto mb-4 flex size-16 items-center justify-center rounded-full bg-green-100">
-              <CheckCircle2 className="size-8 text-green-600" />
-            </div>
-            <DialogTitle className="text-center font-serif text-xl">
-              Pedido confirmado!
-            </DialogTitle>
-            <DialogDescription className="text-center">
-              Obrigado pela sua compra. Voce recebera um email com os detalhes
-              do pedido em breve.
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter className="sm:justify-center">
-            <Button
-              onClick={handleSuccessClose}
-              className="bg-[#1a1a1a] text-white hover:bg-[#1a1a1a]/90"
-            >
-              Voltar para a loja
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
     </div>
   )
 }
