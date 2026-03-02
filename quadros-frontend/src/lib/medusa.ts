@@ -1,5 +1,8 @@
+// Server-side uses MEDUSA_BACKEND_URL (absolute), client-side uses empty (relative, proxied via Next.js rewrites)
 const MEDUSA_BACKEND_URL =
-  process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000"
+  typeof window === "undefined"
+    ? (process.env.MEDUSA_BACKEND_URL || process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "http://localhost:9000")
+    : (process.env.NEXT_PUBLIC_MEDUSA_BACKEND_URL || "")
 const PUBLISHABLE_API_KEY =
   process.env.NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY ||
   "pk_f69ae9716e3053c6d517eb6245a23ad35c0b0c6970f5d358cf6286428e62a7ac"
