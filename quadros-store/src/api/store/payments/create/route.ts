@@ -1,9 +1,7 @@
 import { MedusaRequest, MedusaResponse } from "@medusajs/framework/http"
-import { MercadoPagoConfig, Payment } from "mercadopago"
+import crypto from "crypto"
 
-const mpConfig = new MercadoPagoConfig({
-  accessToken: process.env.MERCADOPAGO_ACCESS_TOKEN || "",
-})
+const MP_ACCESS_TOKEN = process.env.MERCADOPAGO_ACCESS_TOKEN || ""
 
 interface CreatePaymentBody {
   cart_id: string
@@ -44,8 +42,6 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       return
     }
 
-    const paymentClient = new Payment(mpConfig)
-
     const paymentBody: Record<string, unknown> = {
       transaction_amount: Math.round(body.total * 100) / 100,
       description: body.description || "Quadros Store - Pedido",
@@ -81,7 +77,27 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     }
 
     console.log("Creating MP payment with body:", JSON.stringify(paymentBody, null, 2))
-    const payment = await paymentClient.create({ body: paymentBody as any })
+
+    const mpResponse = await fetch("https://api.mercadopago.com/v1/payments", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${MP_ACCESS_TOKEN}`,
+        "X-Idempotency-Key": crypto.randomUUID(),
+      },
+      body: JSON.stringify(paymentBody),
+    })
+
+    const payment = await mpResponse.json()
+    console.log("MP response status:", mpResponse.status, "body:", JSON.stringify(payment, null, 2))
+
+    if (!mpResponse.ok) {
+      throw {
+        message: payment.message || "Payment creation failed",
+        status: mpResponse.status,
+        cause: payment.cause || [],
+      }
+    }
 
     const result: Record<string, unknown> = {
       payment_id: payment.id,
@@ -96,8 +112,8 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     }
 
     if (body.payment_method === "bolbradesco") {
-      result.barcode = (payment as any).barcode?.content
-      result.ticket_url = (payment as any).transaction_details?.external_resource_url
+      result.barcode = payment.barcode?.content
+      result.ticket_url = payment.transaction_details?.external_resource_url
     }
 
     res.json(result)
