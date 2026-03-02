@@ -168,7 +168,7 @@ export default function OrderDetailPage() {
                   </p>
                 </div>
                 <p className="shrink-0 pl-4 text-sm text-[#1a1a1a]">
-                  {formatPrice(item.total, currencyCode)}
+                  {formatPrice(item.total ?? item.unit_price * item.quantity, currencyCode)}
                 </p>
               </div>
             </div>
