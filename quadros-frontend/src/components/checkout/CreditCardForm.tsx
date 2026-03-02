@@ -101,12 +101,15 @@ export function CreditCardForm({
   // Fetch installments when BIN (first 6 digits) or amount changes
   const prevBinRef = useRef("")
   const prevAmountRef = useRef(0)
+  const fetchingInstallmentsRef = useRef(false)
   useEffect(() => {
     const bin = cardNumber.replace(/\s/g, "").slice(0, 6)
     if (bin.length < 6 || !mpRef.current) return
     if (bin === prevBinRef.current && amount === prevAmountRef.current) return
+    if (fetchingInstallmentsRef.current) return
     prevBinRef.current = bin
     prevAmountRef.current = amount
+    fetchingInstallmentsRef.current = true
 
     mpRef.current
       .getInstallments({ amount: String(amount), bin })
@@ -129,6 +132,9 @@ export function CreditCardForm({
       })
       .catch(() => {
         // Ignore installment fetch errors
+      })
+      .finally(() => {
+        fetchingInstallmentsRef.current = false
       })
   }, [cardNumber, amount])
 

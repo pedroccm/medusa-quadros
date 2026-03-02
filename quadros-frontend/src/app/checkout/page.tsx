@@ -194,26 +194,25 @@ export default function CheckoutPage() {
       const data: ViaCEPResponse = await res.json()
 
       if (data.erro) {
-        setCepError("CEP nao encontrado")
-        return
+        setCepError("CEP nao encontrado. Preencha o endereco manualmente.")
+      } else {
+        setForm((prev) => ({
+          ...prev,
+          rua: data.logradouro || prev.rua,
+          bairro: data.bairro || prev.bairro,
+          cidade: data.localidade || prev.cidade,
+          estado: data.uf || prev.estado,
+          shippingOptionId: "",
+        }))
       }
-
-      setForm((prev) => ({
-        ...prev,
-        rua: data.logradouro || prev.rua,
-        bairro: data.bairro || prev.bairro,
-        cidade: data.localidade || prev.cidade,
-        estado: data.uf || prev.estado,
-        shippingOptionId: "",
-      }))
-
-      // Fetch real shipping options from Melhor Envio
-      fetchShippingOptions(digits)
     } catch {
-      setCepError("Erro ao buscar CEP. Tente novamente.")
+      setCepError("Nao foi possivel buscar o CEP. Preencha o endereco manualmente.")
     } finally {
       setCepLoading(false)
     }
+
+    // Always calculate shipping if we have a valid CEP
+    fetchShippingOptions(digits)
   }, [fetchShippingOptions])
 
   // ------- Validation -------
