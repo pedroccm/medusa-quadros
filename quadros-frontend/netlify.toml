@@ -4,8 +4,8 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  NEXT_PUBLIC_MEDUSA_BACKEND_URL = "http://localhost:9000"
-  NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY = "pk_f69ae9716e3053c6d517eb6245a23ad35c0b0c6970f5d358cf6286428e62a7ac"
+  NEXT_PUBLIC_MEDUSA_BACKEND_URL = "http://165.227.197.59:9000"
+  NEXT_PUBLIC_MEDUSA_PUBLISHABLE_KEY = "pk_c2f5589f16eddc02305bfabd1ae20902c62bd43d2ef5ea7070310fd4f7f2b9e1"
 
 [[plugins]]
   package = "@netlify/plugin-nextjs"
