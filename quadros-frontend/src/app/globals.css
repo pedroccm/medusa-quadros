@@ -147,3 +147,16 @@
 .font-body {
   font-family: "Inter", ui-sans-serif, system-ui, sans-serif;
 }
+
+/* Mercado Pago secure iframe fields */
+.mp-iframe-container {
+  position: relative;
+  overflow: hidden;
+}
+
+.mp-iframe-container iframe {
+  width: 100% !important;
+  height: 100% !important;
+  border: none !important;
+  display: block !important;
+}

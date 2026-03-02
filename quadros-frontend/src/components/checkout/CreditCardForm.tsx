@@ -52,6 +52,14 @@ export function CreditCardForm({
           { locale: "pt-BR" }
         )
 
+        const fieldStyle = {
+          fontSize: "14px",
+          fontFamily: "Inter, sans-serif",
+          color: "#1a1a1a",
+          "placeholder-color": "rgba(26, 26, 26, 0.5)",
+          padding: "0 12px",
+        }
+
         cardFormRef.current = mp.cardForm({
           amount: String(amount),
           iframe: true,
@@ -60,32 +68,17 @@ export function CreditCardForm({
             cardNumber: {
               id: "mp-card-number",
               placeholder: "Numero do cartao",
-              style: {
-                fontSize: "14px",
-                fontFamily: "Inter, sans-serif",
-                color: "#1a1a1a",
-                "placeholder-color": "#1a1a1a80",
-              },
+              style: fieldStyle,
             },
             expirationDate: {
               id: "mp-expiration-date",
               placeholder: "MM/AA",
-              style: {
-                fontSize: "14px",
-                fontFamily: "Inter, sans-serif",
-                color: "#1a1a1a",
-                "placeholder-color": "#1a1a1a80",
-              },
+              style: fieldStyle,
             },
             securityCode: {
               id: "mp-security-code",
               placeholder: "CVV",
-              style: {
-                fontSize: "14px",
-                fontFamily: "Inter, sans-serif",
-                color: "#1a1a1a",
-                "placeholder-color": "#1a1a1a80",
-              },
+              style: fieldStyle,
             },
             cardholderName: {
               id: "mp-cardholder-name",
@@ -182,7 +175,7 @@ export function CreditCardForm({
           </label>
           <div
             id="mp-card-number"
-            className="h-10 rounded-md border border-[#e5e5e5] px-3"
+            className="mp-iframe-container h-10 rounded-md border border-[#e5e5e5]"
           />
         </div>
 
@@ -193,7 +186,7 @@ export function CreditCardForm({
             </label>
             <div
               id="mp-expiration-date"
-              className="h-10 rounded-md border border-[#e5e5e5] px-3"
+              className="mp-iframe-container h-10 rounded-md border border-[#e5e5e5]"
             />
           </div>
           <div>
@@ -202,7 +195,7 @@ export function CreditCardForm({
             </label>
             <div
               id="mp-security-code"
-              className="h-10 rounded-md border border-[#e5e5e5] px-3"
+              className="mp-iframe-container h-10 rounded-md border border-[#e5e5e5]"
             />
           </div>
         </div>
