@@ -284,6 +284,15 @@ export default function CheckoutPage() {
         payment_method: form.paymentMethod,
         payer: buildPayerData(),
         total: Math.round(total * 100) / 100,
+        phone: form.telefone,
+        address: {
+          street_name: form.rua,
+          street_number: form.numero,
+          zip_code: form.cep.replace(/\D/g, ""),
+          city: form.cidade,
+          state: form.estado,
+          neighborhood: form.bairro,
+        },
       }
 
       if (form.paymentMethod === "credit_card" && cardTokenData) {

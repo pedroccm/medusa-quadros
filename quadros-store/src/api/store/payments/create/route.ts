@@ -21,6 +21,15 @@ interface CreatePaymentBody {
   issuer_id?: string
   total: number
   description?: string
+  phone?: string
+  address?: {
+    street_name: string
+    street_number: string
+    zip_code: string
+    city: string
+    state: string
+    neighborhood: string
+  }
 }
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
@@ -42,6 +51,10 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       return
     }
 
+    const phoneDigits = (body.phone || "").replace(/\D/g, "")
+    const areaCode = phoneDigits.slice(0, 2)
+    const phoneNumber = phoneDigits.slice(2)
+
     const paymentBody: Record<string, unknown> = {
       transaction_amount: Math.round(body.total * 100) / 100,
       description: body.description || "Quadros Store - Pedido",
@@ -51,6 +64,52 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         first_name: body.payer.first_name,
         last_name: body.payer.last_name,
         identification: body.payer.identification,
+        ...(phoneDigits && {
+          phone: {
+            area_code: areaCode,
+            number: phoneNumber,
+          },
+        }),
+        ...(body.address && {
+          address: {
+            zip_code: body.address.zip_code,
+            street_name: body.address.street_name,
+            street_number: body.address.street_number,
+            neighborhood: body.address.neighborhood,
+            city: body.address.city,
+            federal_unit: body.address.state,
+          },
+        }),
+      },
+      additional_info: {
+        payer: {
+          first_name: body.payer.first_name,
+          last_name: body.payer.last_name,
+          ...(phoneDigits && {
+            phone: {
+              area_code: areaCode,
+              number: phoneNumber,
+            },
+          }),
+          ...(body.address && {
+            address: {
+              zip_code: body.address.zip_code,
+              street_name: body.address.street_name,
+              street_number: body.address.street_number,
+            },
+          }),
+        },
+        ...(body.address && {
+          shipments: {
+            receiver_address: {
+              zip_code: body.address.zip_code,
+              street_name: body.address.street_name,
+              street_number: body.address.street_number,
+              city_name: body.address.city,
+              state_name: body.address.state,
+            },
+          },
+        }),
       },
       metadata: {
         cart_id: body.cart_id,
