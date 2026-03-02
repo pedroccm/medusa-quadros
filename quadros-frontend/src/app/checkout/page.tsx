@@ -685,6 +685,7 @@ export default function CheckoutPage() {
               {form.paymentMethod === "credit_card" && total > 0 && (
                 <CreditCardForm
                   amount={total}
+                  cpf={form.cpf}
                   onTokenGenerated={handleCardToken}
                   onError={handleCardError}
                 />
@@ -748,7 +749,7 @@ export default function CheckoutPage() {
                       {item.title}
                     </p>
                     <span className="shrink-0 text-sm text-[#1a1a1a]">
-                      {formatPrice(item.total)}
+                      {formatPrice(item.unit_price * item.quantity)}
                     </span>
                   </div>
                 </div>
