@@ -145,8 +145,9 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
     setIsLoading(true)
     try {
-      const { cart: updated } = await removeCartItem(cartId, lineItemId)
-      setCart(updated)
+      await removeCartItem(cartId, lineItemId)
+      const { cart: refreshed } = await getCart(cartId)
+      setCart(refreshed)
     } finally {
       setIsLoading(false)
     }
