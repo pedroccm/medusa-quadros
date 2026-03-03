@@ -49,14 +49,27 @@ async function asaasRequest(path: string, method: string = "GET", body?: unknown
     ...(body ? { body: JSON.stringify(body) } : {}),
   })
 
-  const data = await response.json()
+  // Parse response body safely (some endpoints return empty body)
+  const rawText = await response.text()
+  let data: any = null
+  try {
+    data = rawText ? JSON.parse(rawText) : null
+  } catch {
+    console.error(`${LOG_PREFIX} ${method} ${path} - Failed to parse response (${response.status}): ${rawText.slice(0, 200)}`)
+    throw {
+      message: `Asaas returned invalid JSON (HTTP ${response.status})`,
+      status: response.status,
+      cause: [],
+      endpoint: path,
+    }
+  }
 
   if (!response.ok) {
     console.error(`${LOG_PREFIX} ${method} ${path} FAILED (${response.status}):`, JSON.stringify(data, null, 2))
     throw {
-      message: data.errors?.[0]?.description || data.message || "Asaas API error",
+      message: data?.errors?.[0]?.description || data?.message || `Asaas API error (HTTP ${response.status})`,
       status: response.status,
-      cause: data.errors || [],
+      cause: data?.errors || [],
       endpoint: path,
     }
   }

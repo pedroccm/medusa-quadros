@@ -704,23 +704,25 @@ export default function CheckoutPage() {
             </div>
           </section>
 
-          {/* ------- Confirm button (mobile) ------- */}
-          <div className="lg:hidden">
-            <Button
-              onClick={handleSubmit}
-              disabled={!isFormValid || submitting}
-              className="w-full bg-[#1a1a1a] text-white hover:bg-[#1a1a1a]/90"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  Processando pagamento...
-                </>
-              ) : (
-                `Pagar ${formatPrice(total)}`
-              )}
-            </Button>
-          </div>
+          {/* ------- Confirm button (mobile) - hidden for credit card (card form has its own) ------- */}
+          {form.paymentMethod !== "credit_card" && (
+            <div className="lg:hidden">
+              <Button
+                onClick={handleSubmit}
+                disabled={!isFormValid || submitting}
+                className="w-full bg-[#1a1a1a] text-white hover:bg-[#1a1a1a]/90"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Processando pagamento...
+                  </>
+                ) : (
+                  `Pagar ${formatPrice(total)}`
+                )}
+              </Button>
+            </div>
+          )}
         </div>
 
         {/* ============================================================ */}
@@ -800,21 +802,23 @@ export default function CheckoutPage() {
               </span>
             </div>
 
-            {/* Confirm button (desktop) */}
-            <Button
-              onClick={handleSubmit}
-              disabled={!isFormValid || submitting}
-              className="mt-6 hidden w-full bg-[#1a1a1a] text-white hover:bg-[#1a1a1a]/90 lg:flex"
-            >
-              {submitting ? (
-                <>
-                  <Loader2 className="mr-2 size-4 animate-spin" />
-                  Processando pagamento...
-                </>
-              ) : (
-                `Pagar ${formatPrice(total)}`
-              )}
-            </Button>
+            {/* Confirm button (desktop) - hidden for credit card (card form has its own) */}
+            {form.paymentMethod !== "credit_card" && (
+              <Button
+                onClick={handleSubmit}
+                disabled={!isFormValid || submitting}
+                className="mt-6 hidden w-full bg-[#1a1a1a] text-white hover:bg-[#1a1a1a]/90 lg:flex"
+              >
+                {submitting ? (
+                  <>
+                    <Loader2 className="mr-2 size-4 animate-spin" />
+                    Processando pagamento...
+                  </>
+                ) : (
+                  `Pagar ${formatPrice(total)}`
+                )}
+              </Button>
+            )}
           </div>
         </div>
       </div>
