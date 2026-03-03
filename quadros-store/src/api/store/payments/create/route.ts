@@ -30,6 +30,14 @@ interface CreatePaymentBody {
     state: string
     neighborhood: string
   }
+  items?: Array<{
+    id: string
+    title: string
+    description?: string
+    quantity: number
+    unit_price: number
+    category_id?: string
+  }>
 }
 
 export async function POST(req: MedusaRequest, res: MedusaResponse) {
@@ -55,10 +63,23 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
     const areaCode = phoneDigits.slice(0, 2)
     const phoneNumber = phoneDigits.slice(2)
 
+    // Build items for MP
+    const items = body.items?.map(item => ({
+      id: item.id,
+      title: item.title,
+      description: item.description || item.title,
+      quantity: item.quantity,
+      unit_price: Math.round(item.unit_price * 100) / 100,
+      category_id: item.category_id || "others",
+    })) || []
+
     const paymentBody: Record<string, unknown> = {
       transaction_amount: Math.round(body.total * 100) / 100,
       description: body.description || "Quadros Store - Pedido",
       payment_method_id: body.payment_method === "pix" ? "pix" : body.payment_method === "bolbradesco" ? "bolbradesco" : body.payment_method_id,
+      notification_url: "https://api.ariaquadros.com.br/store/webhooks/mercadopago",
+      statement_descriptor: "ARIA QUADROS",
+      external_reference: body.cart_id,
       payer: {
         email: body.payer.email,
         first_name: body.payer.first_name,
@@ -82,6 +103,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
         }),
       },
       additional_info: {
+        items: items,
         payer: {
           first_name: body.payer.first_name,
           last_name: body.payer.last_name,
@@ -121,7 +143,7 @@ export async function POST(req: MedusaRequest, res: MedusaResponse) {
       paymentBody.installments = body.installments || 1
       paymentBody.binary_mode = false
       paymentBody.three_d_secure_mode = "optional"
-      paymentBody.callback_url = "https://quadros-loja.netlify.app/checkout"
+      paymentBody.callback_url = "https://ariaquadros.com.br/checkout"
       if (body.issuer_id) {
         const parsedIssuerId = Number(body.issuer_id)
         if (!isNaN(parsedIssuerId)) {

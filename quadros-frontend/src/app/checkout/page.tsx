@@ -320,6 +320,14 @@ export default function CheckoutPage() {
           state: form.estado,
           neighborhood: form.bairro,
         },
+        items: items.map((item) => ({
+          id: item.id,
+          title: item.title,
+          description: item.product?.description || item.title,
+          quantity: item.quantity,
+          unit_price: item.unit_price,
+          category_id: item.product?.categories?.[0]?.id || "others",
+        })),
       }
 
       if (form.paymentMethod === "credit_card" && cardTokenData) {
