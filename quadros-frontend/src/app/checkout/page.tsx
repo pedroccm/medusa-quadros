@@ -7,7 +7,7 @@ import { useRouter } from "next/navigation"
 import { ArrowLeft, Loader2, Truck } from "lucide-react"
 import { toast } from "sonner"
 import { useCart } from "@/context/CartContext"
-import { formatPrice, createAsaasPayment, calculateShipping } from "@/lib/medusa"
+import { formatPrice, createAsaasPayment, completeCart, updateCart, calculateShipping } from "@/lib/medusa"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
@@ -298,6 +298,24 @@ export default function CheckoutPage() {
     setSubmitting(true)
 
     try {
+      // Update cart with customer info for Medusa order creation
+      const address = {
+        first_name: form.nome.split(" ")[0],
+        last_name: form.nome.split(" ").slice(1).join(" ") || form.nome.split(" ")[0],
+        address_1: `${form.rua}, ${form.numero}`,
+        address_2: form.complemento || undefined,
+        city: form.cidade,
+        province: form.estado,
+        postal_code: form.cep.replace(/\D/g, ""),
+        country_code: "br",
+        phone: form.telefone,
+      }
+      await updateCart(cart.id, {
+        email: form.email,
+        shipping_address: address,
+        billing_address: address,
+      })
+
       const paymentData: any = {
         cart_id: cart.id,
         payment_method: form.paymentMethod,
@@ -328,15 +346,17 @@ export default function CheckoutPage() {
         setPaymentStep("awaiting_pix")
       } else if (form.paymentMethod === "credit_card") {
         // Asaas returns statuses: CONFIRMED, PENDING, RECEIVED
-        if (result.status === "CONFIRMED" || result.status === "RECEIVED") {
+        if (result.status === "CONFIRMED" || result.status === "RECEIVED" || result.status === "PENDING") {
+          // Complete the cart in Medusa to create an order
+          try {
+            await completeCart(cart.id)
+          } catch (e) {
+            console.error("Failed to complete cart:", e)
+          }
           localStorage.removeItem("quadros_cart_id")
           refreshCart()
-          router.push("/pedido-confirmado?method=card&provider=asaas")
-        } else if (result.status === "PENDING") {
-          // Payment pending (may need 3DS or manual approval)
-          localStorage.removeItem("quadros_cart_id")
-          refreshCart()
-          router.push("/pedido-confirmado?method=card&provider=asaas&pending=true")
+          const pending = result.status === "PENDING" ? "&pending=true" : ""
+          router.push(`/pedido-confirmado?method=card&provider=asaas${pending}`)
         } else {
           setAsaasCardData(null)
           toast.error(
@@ -379,11 +399,16 @@ export default function CheckoutPage() {
     toast.error(message)
   }, [])
 
-  const handlePixConfirmed = useCallback(() => {
+  const handlePixConfirmed = useCallback(async () => {
+    try {
+      if (cart?.id) await completeCart(cart.id)
+    } catch (e) {
+      console.error("Failed to complete cart:", e)
+    }
     localStorage.removeItem("quadros_cart_id")
     refreshCart()
     router.push("/pedido-confirmado?method=pix")
-  }, [refreshCart, router])
+  }, [cart?.id, refreshCart, router])
 
   // ------- Render -------
 

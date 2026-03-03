@@ -181,6 +181,16 @@ export async function getCart(
   return medusaFetch(`/store/carts/${cartId}`)
 }
 
+export async function updateCart(
+  cartId: string,
+  data: Record<string, unknown>
+): Promise<{ cart: MedusaCart }> {
+  return medusaFetch(`/store/carts/${cartId}`, {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
 export async function addToCart(
   cartId: string,
   variantId: string,
@@ -232,9 +242,45 @@ export async function addShippingMethod(
 
 // --- Checkout ---
 
+export async function initPaymentSession(
+  cartId: string
+): Promise<void> {
+  // Fetch cart to get payment_collection
+  const cartData: any = await medusaFetch(`/store/carts/${cartId}?fields=+payment_collection.payment_sessions`)
+  const cart = cartData.cart || cartData
+
+  let paymentCollectionId = cart.payment_collection?.id
+
+  // Create payment collection if missing
+  if (!paymentCollectionId) {
+    const pc: any = await medusaFetch(`/store/payment-collections`, {
+      method: "POST",
+      body: JSON.stringify({ cart_id: cartId }),
+    })
+    paymentCollectionId = pc.payment_collection?.id
+  }
+
+  if (!paymentCollectionId) {
+    throw new Error("Could not create payment collection")
+  }
+
+  // Check if session already exists
+  const sessions = cart.payment_collection?.payment_sessions || []
+  if (sessions.length > 0) return
+
+  // Initialize payment session with system default provider
+  await medusaFetch(`/store/payment-collections/${paymentCollectionId}/payment-sessions`, {
+    method: "POST",
+    body: JSON.stringify({ provider_id: "pp_system_default" }),
+  })
+}
+
 export async function completeCart(
   cartId: string
 ): Promise<{ type: string; data: Record<string, unknown> }> {
+  // Ensure payment session is initialized before completing
+  await initPaymentSession(cartId)
+
   return medusaFetch(`/store/carts/${cartId}/complete`, {
     method: "POST",
   })
