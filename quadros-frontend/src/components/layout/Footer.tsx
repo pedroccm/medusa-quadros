@@ -68,7 +68,7 @@ export function Footer() {
       <div className="border-t border-white/10">
         <div className="mx-auto max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
           <p className="text-center text-xs text-white/40">
-            {new Date().getFullYear()} Quadros Store. Todos os direitos reservados. v0.0.7
+            {new Date().getFullYear()} Quadros Store. Todos os direitos reservados. v0.0.8
           </p>
         </div>
       </div>

@@ -1,20 +1,19 @@
 "use client"
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 import { ArrowLeft, Loader2, Truck } from "lucide-react"
 import { toast } from "sonner"
 import { useCart } from "@/context/CartContext"
-import { formatPrice, createPayment, calculateShipping } from "@/lib/medusa"
+import { formatPrice, createAsaasPayment, calculateShipping } from "@/lib/medusa"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Separator } from "@/components/ui/separator"
 import { PaymentMethodSelector } from "@/components/checkout/PaymentMethodSelector"
-import { CreditCardForm } from "@/components/checkout/CreditCardForm"
 import { PixPayment } from "@/components/checkout/PixPayment"
-import { BoletoPayment } from "@/components/checkout/BoletoPayment"
+import { CreditCardFormAsaas } from "@/components/checkout/CreditCardFormAsaas"
 
 // ---------------------------------------------------------------------------
 // Types
@@ -39,8 +38,8 @@ interface ShippingOption {
   delivery_max: number
 }
 
-type PaymentMethod = "pix" | "credit_card" | "bolbradesco"
-type PaymentStep = "form" | "awaiting_pix" | "awaiting_boleto"
+type PaymentMethod = "pix" | "credit_card"
+type PaymentStep = "form" | "awaiting_pix"
 
 interface FormData {
   nome: string
@@ -56,13 +55,6 @@ interface FormData {
   estado: string
   shippingOptionId: string
   paymentMethod: PaymentMethod
-}
-
-interface CardTokenData {
-  token: string
-  installments: number
-  payment_method_id: string
-  issuer_id: string
 }
 
 // ---------------------------------------------------------------------------
@@ -132,12 +124,15 @@ export default function CheckoutPage() {
     qrCode: string
     qrCodeBase64: string
   } | null>(null)
-  const [boletoData, setBoletoData] = useState<{
-    barcode: string
-    ticketUrl: string
+  // Asaas card data
+  const [asaasCardData, setAsaasCardData] = useState<{
+    holder_name: string
+    number: string
+    expiry_month: string
+    expiry_year: string
+    security_code: string
+    installments: number
   } | null>(null)
-  const [cardTokenData, setCardTokenData] = useState<CardTokenData | null>(null)
-  const cardFormRef = useRef<{ submit: () => void } | null>(null)
 
   const selectedShipping = shippingOptions.find(
     (o) => o.id === form.shippingOptionId
@@ -291,15 +286,9 @@ export default function CheckoutPage() {
       return
     }
 
-    // For credit card, we need the token first
-    if (form.paymentMethod === "credit_card" && !cardTokenData) {
-      // Trigger the card form submission via the MercadoPago SDK
-      const cardForm = document.getElementById("mp-card-form") as HTMLFormElement
-      if (cardForm) {
-        cardForm.requestSubmit()
-      } else {
-        toast.error("Preencha os dados do cartao.")
-      }
+    // For credit card, we need the card data first
+    if (form.paymentMethod === "credit_card" && !asaasCardData) {
+      toast.error("Preencha os dados do cartao.")
       return
     }
 
@@ -312,32 +301,20 @@ export default function CheckoutPage() {
         payer: buildPayerData(),
         total: Math.round(total * 100) / 100,
         phone: form.telefone,
-        address: {
-          street_name: form.rua,
-          street_number: form.numero,
-          zip_code: form.cep.replace(/\D/g, ""),
-          city: form.cidade,
-          state: form.estado,
-          neighborhood: form.bairro,
-        },
-        items: items.map((item) => ({
-          id: item.id,
-          title: item.title,
-          description: item.product?.description || item.title,
-          quantity: item.quantity,
-          unit_price: item.unit_price,
-          category_id: item.product?.categories?.[0]?.id || "others",
-        })),
       }
 
-      if (form.paymentMethod === "credit_card" && cardTokenData) {
-        paymentData.token = cardTokenData.token
-        paymentData.installments = cardTokenData.installments
-        paymentData.payment_method_id = cardTokenData.payment_method_id
-        paymentData.issuer_id = cardTokenData.issuer_id
+      // Add credit card data + address for Asaas
+      if (form.paymentMethod === "credit_card" && asaasCardData) {
+        paymentData.credit_card = asaasCardData
+        paymentData.installments = asaasCardData.installments
+        paymentData.address = {
+          postalCode: form.cep.replace(/\D/g, ""),
+          addressNumber: form.numero,
+        }
       }
 
-      const result = await createPayment(paymentData)
+      // Use Asaas API
+      const result = await createAsaasPayment(paymentData)
 
       if (form.paymentMethod === "pix") {
         setPixData({
@@ -346,55 +323,54 @@ export default function CheckoutPage() {
           qrCodeBase64: result.qr_code_base64 || "",
         })
         setPaymentStep("awaiting_pix")
-      } else if (form.paymentMethod === "bolbradesco") {
-        setBoletoData({
-          barcode: result.barcode || "",
-          ticketUrl: result.ticket_url || "",
-        })
-        setPaymentStep("awaiting_boleto")
       } else if (form.paymentMethod === "credit_card") {
-        if (result.status === "approved") {
+        // Asaas returns statuses: CONFIRMED, PENDING, RECEIVED
+        if (result.status === "CONFIRMED" || result.status === "RECEIVED") {
           localStorage.removeItem("quadros_cart_id")
           refreshCart()
-          router.push("/pedido-confirmado?method=card")
-        } else if (result.three_ds_url) {
-          // 3D Secure challenge - redirect user to bank verification
-          window.location.href = result.three_ds_url
-        } else if (result.status === "in_process") {
+          router.push("/pedido-confirmado?method=card&provider=asaas")
+        } else if (result.status === "PENDING") {
+          // Payment pending (may need 3DS or manual approval)
           localStorage.removeItem("quadros_cart_id")
           refreshCart()
-          router.push("/pedido-confirmado?method=card&pending=true")
+          router.push("/pedido-confirmado?method=card&provider=asaas&pending=true")
         } else {
-          setCardTokenData(null)
+          setAsaasCardData(null)
           toast.error(
-            `Pagamento ${result.status === "rejected" ? "recusado" : "nao aprovado"}. Tente novamente.`
+            `Pagamento ${result.status === "REJECTED" ? "recusado" : "nao aprovado"}. Tente novamente.`
           )
         }
       }
     } catch (error: any) {
       console.error("Payment error:", error)
-      setCardTokenData(null)
+      setAsaasCardData(null)
       toast.error(error?.message || "Erro ao processar pagamento. Tente novamente.")
     } finally {
       setSubmitting(false)
     }
-  }, [isFormValid, cart?.id, form.paymentMethod, cardTokenData, buildPayerData, total, refreshCart, router])
+  }, [isFormValid, cart?.id, form.paymentMethod, asaasCardData, buildPayerData, total, refreshCart, router])
 
-  // Handle card token generated (from CreditCardForm)
-  const handleCardToken = useCallback(
-    (data: CardTokenData) => {
-      setCardTokenData(data)
+  // Handle card data generated (from CreditCardFormAsaas)
+  const handleCardData = useCallback(
+    (data: {
+      holder_name: string
+      number: string
+      expiry_month: string
+      expiry_year: string
+      security_code: string
+      installments: number
+    }) => {
+      setAsaasCardData(data)
     },
     []
   )
 
-  // Auto-submit when card token is generated
+  // Auto-submit when card data is generated
   useEffect(() => {
-    if (cardTokenData && form.paymentMethod === "credit_card") {
+    if (asaasCardData && form.paymentMethod === "credit_card") {
       handleSubmit()
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardTokenData])
+  }, [asaasCardData])
 
   const handleCardError = useCallback((message: string) => {
     toast.error(message)
@@ -450,26 +426,6 @@ export default function CheckoutPage() {
     )
   }
 
-  if (paymentStep === "awaiting_boleto" && boletoData) {
-    return (
-      <div className="mx-auto max-w-lg px-4 py-10 sm:px-6">
-        <h1 className="text-center font-serif text-2xl text-[#1a1a1a]">
-          Pagamento via Boleto
-        </h1>
-        <div className="mt-6 rounded-lg border border-[#e5e5e5] bg-white p-6">
-          <BoletoPayment
-            barcode={boletoData.barcode}
-            ticketUrl={boletoData.ticketUrl}
-          />
-        </div>
-        <div className="mt-4 text-center">
-          <p className="text-sm text-[#1a1a1a]/50">
-            Total: <strong>{formatPrice(total)}</strong>
-          </p>
-        </div>
-      </div>
-    )
-  }
 
   return (
     <div className="mx-auto max-w-7xl px-4 py-10 sm:px-6 lg:px-8">
@@ -732,16 +688,17 @@ export default function CheckoutPage() {
                 selected={form.paymentMethod}
                 onChange={(method) => {
                   updateField("paymentMethod", method)
-                  setCardTokenData(null)
+                  setAsaasCardData(null)
                 }}
               />
 
               {form.paymentMethod === "credit_card" && total > 0 && (
-                <CreditCardForm
+                <CreditCardFormAsaas
                   amount={total}
                   cpf={form.cpf}
-                  onTokenGenerated={handleCardToken}
+                  onSubmit={handleCardData}
                   onError={handleCardError}
+                  submitting={submitting}
                 />
               )}
             </div>

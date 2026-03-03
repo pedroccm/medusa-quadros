@@ -310,10 +310,26 @@ export interface AsaasPaymentRequest {
     phone?: string
   }
   total: number
+  phone?: string
   description?: string
+  credit_card?: {
+    holder_name: string
+    number: string
+    expiry_month: string
+    expiry_year: string
+    security_code: string
+  }
+  installments?: number
+  address?: {
+    postalCode: string
+    addressNumber: string
+  }
 }
 
-export interface AsaasPaymentResult extends PaymentResult {}
+export interface AsaasPaymentResult extends PaymentResult {
+  authorization_code?: string
+  nsu?: string
+}
 
 export async function createAsaasPayment(
   data: AsaasPaymentRequest

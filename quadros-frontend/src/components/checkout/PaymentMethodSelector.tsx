@@ -1,8 +1,8 @@
 "use client"
 
-import { QrCode, CreditCard, FileText } from "lucide-react"
+import { QrCode, CreditCard } from "lucide-react"
 
-type PaymentMethod = "pix" | "credit_card" | "bolbradesco"
+type PaymentMethod = "pix" | "credit_card"
 
 interface PaymentMethodSelectorProps {
   selected: PaymentMethod
@@ -21,12 +21,6 @@ const methods = [
     label: "Cartao de Credito",
     description: "Ate 12x sem juros",
     icon: CreditCard,
-  },
-  {
-    id: "bolbradesco" as PaymentMethod,
-    label: "Boleto",
-    description: "Ate 2 dias uteis",
-    icon: FileText,
   },
 ]
 

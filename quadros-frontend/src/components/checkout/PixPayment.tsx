@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState, useCallback } from "react"
 import { Check, Copy, Clock, Loader2 } from "lucide-react"
 import { Button } from "@/components/ui/button"
-import { getPaymentStatus } from "@/lib/medusa"
+import { getAsaasPaymentStatus } from "@/lib/medusa"
 
 interface PixPaymentProps {
   paymentId: string
@@ -45,8 +45,8 @@ export function PixPayment({
   useEffect(() => {
     pollingRef.current = setInterval(async () => {
       try {
-        const result = await getPaymentStatus(paymentId)
-        if (result.status === "approved") {
+        const result = await getAsaasPaymentStatus(paymentId)
+        if (result.status === "RECEIVED" || result.status === "CONFIRMED") {
           onConfirmed()
         }
       } catch {
