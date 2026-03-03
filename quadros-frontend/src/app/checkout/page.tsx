@@ -94,20 +94,23 @@ export default function CheckoutPage() {
   const isEmpty = items.length === 0
   const subtotal = cart?.subtotal ?? 0
 
+  // TODO: Remove test defaults before production launch
+  const DEV_DEFAULTS = process.env.NODE_ENV === "development" || process.env.NEXT_PUBLIC_TEST_MODE === "true"
+
   const [form, setForm] = useState<FormData>({
-    nome: "",
-    email: "",
-    telefone: "",
-    cpf: "",
-    cep: "",
-    rua: "",
-    numero: "",
-    complemento: "",
-    bairro: "",
-    cidade: "",
-    estado: "",
+    nome: DEV_DEFAULTS ? "Pedro Marques" : "",
+    email: DEV_DEFAULTS ? "pedroccm@gmail.com" : "",
+    telefone: DEV_DEFAULTS ? "(19) 99128-8963" : "",
+    cpf: DEV_DEFAULTS ? "339.204.218-84" : "",
+    cep: DEV_DEFAULTS ? "05510-021" : "",
+    rua: DEV_DEFAULTS ? "Rua M.M.D.C." : "",
+    numero: DEV_DEFAULTS ? "539" : "",
+    complemento: DEV_DEFAULTS ? "ap52" : "",
+    bairro: DEV_DEFAULTS ? "Butanta" : "",
+    cidade: DEV_DEFAULTS ? "Sao Paulo" : "",
+    estado: DEV_DEFAULTS ? "SP" : "",
     shippingOptionId: "",
-    paymentMethod: "pix",
+    paymentMethod: "credit_card",
   })
 
   const [cepLoading, setCepLoading] = useState(false)
