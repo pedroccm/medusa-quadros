@@ -294,6 +294,42 @@ export async function getPaymentStatus(
   return medusaFetch(`/store/payments/${paymentId}/status`)
 }
 
+// --- Asaas Payment ---
+
+export interface AsaasPaymentRequest {
+  cart_id: string
+  payment_method: "pix" | "credit_card"
+  payer: {
+    email: string
+    first_name: string
+    last_name: string
+    identification: {
+      type: string
+      number: string
+    }
+    phone?: string
+  }
+  total: number
+  description?: string
+}
+
+export interface AsaasPaymentResult extends PaymentResult {}
+
+export async function createAsaasPayment(
+  data: AsaasPaymentRequest
+): Promise<AsaasPaymentResult> {
+  return medusaFetch("/store/payments/asaas/create", {
+    method: "POST",
+    body: JSON.stringify(data),
+  })
+}
+
+export async function getAsaasPaymentStatus(
+  paymentId: string
+): Promise<PaymentStatus> {
+  return medusaFetch(`/store/payments/asaas/${paymentId}/status`)
+}
+
 // --- Shipping Calculation (Melhor Envio) ---
 
 export interface ShippingCalculateItem {
