@@ -37,7 +37,7 @@ export default function ExchangesPage() {
           <ol className="mt-4 list-decimal space-y-3 pl-6">
             <li>
               Entre em contato pelo email{" "}
-              <strong>contato@quadrosstore.com.br</strong> informando o número
+              <strong>contato@ariaquadros.com.br</strong> informando o número
               do pedido e o motivo da troca/devolução.
             </li>
             <li>
